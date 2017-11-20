@@ -9,6 +9,11 @@ const D_DR = 5;
 function Point(x, y) {
     this.x = x;
     this.y = y;
+
+    this.dis = function(other) {
+        if (this.x == other.x) return this.y > other.y ? this.y - other.y : other.y - this.y;
+        if (this.y == other.y) return this.x > other.x ? this.x - other.x : other.x - this.x;
+    }
 }
 
 function Path(sx, sy, ex, ey, arc, dir) {
@@ -40,6 +45,15 @@ function Path(sx, sy, ex, ey, arc, dir) {
         this.cs3 = false;
     }
     this.dir = dir;
+
+    this.len = function() {
+        return this.s1.dis(this.e1) + this.s2.dis(this.e2) + 0.5*Math.PI*this.cr;
+    }
+    this.len_part = function(index) {
+        if (index == 0) return this.s1.dis(this.e1);
+        if (index == 1) return 0.5*Math.PI*this.cr;
+        if (index == 2) return this.s2.dis(this.e2);
+    }
 }
 
 function load() {
