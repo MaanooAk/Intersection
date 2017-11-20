@@ -88,7 +88,7 @@ function load() {
 
         if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
 
-        for (let i=0; i<4; i++) {
+        for (let i=0; i<2; i++) {
             for (let p of ps) {
 
                 g.beginPath();
@@ -123,7 +123,7 @@ function load() {
                 let x = p.s1.x + (p.e1.x - p.s1.x) * prog;
                 let y = p.s1.y + (p.e1.y - p.s1.y) * prog;
 
-                g.fillRect(x -5, y -5, 10, 10)
+                g.fillRect(x -5, y -10, 10, 20)
 
             } else if (cur < p.len_part(0) + p.len_part(1)) {
 
@@ -132,7 +132,13 @@ function load() {
                 let x = p.e1.x + (p.s2.x - p.e1.x) * prog;
                 let y = p.e1.y + (p.s2.y - p.e1.y) * prog;
 
-                g.fillRect(x -5, y -5, 10, 10)
+                g.save();
+                g.translate(p.cc.x, p.cc.y)
+                g.rotate(p.cs1 + prog * (p.cs2-p.cs1))
+
+                g.fillRect(p.cr -5, -10, 10, 20)
+
+                g.restore();
 
             } else {
                 prog = (cur - p.len_part(0) - p.len_part(1)) / p.len_part(2);
@@ -140,7 +146,7 @@ function load() {
                 let x = p.s2.x + (p.e2.x - p.s2.x) * prog;
                 let y = p.s2.y + (p.e2.y - p.s2.y) * prog;
 
-                g.fillRect(x -5, y -5, 10, 10)
+                g.fillRect(x -10, y -5, 20, 10)
             }
         }
 
@@ -153,17 +159,17 @@ function load() {
         let s = 100;
         let rs = 50;
         let hrs = 25;
-        let rts = 50;
-        let rtb = 75;
+        let rtb = 100;
+        let rts = rtb-rs;
 
         ps = [
             new Path(w/2 + hrs, h, 0, h/2 - hrs , rtb, D_UL),
             new Path(w/2 + hrs, h, w/2 + hrs, 0, D_U),
             new Path(w/2 + hrs, h, w, h/2 + hrs, rts, D_UR),
 
-            new Path(w/2 - hrs, 0, w, h/2 - hrs , rtb, D_DR),
+            new Path(w/2 - hrs, 0, w, h/2 + hrs , rtb, D_DR),
             new Path(w/2 - hrs, 0, w/2 - hrs, h , 0, D_D),
-            new Path(w/2 - hrs, 0, 0, h/2 - hrs , rtb, D_DL),
+            new Path(w/2 - hrs, 0, 0, h/2 - hrs , rts, D_DL),
         ]
 
         cs = [];
