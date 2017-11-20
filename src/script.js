@@ -5,6 +5,12 @@ const D_UR = 2;
 const D_D = 3;
 const D_DL = 4;
 const D_DR = 5;
+const D_L = 6;
+const D_LU = 7;
+const D_LD = 8;
+const D_R = 9;
+const D_RU = 10;
+const D_RD = 11;
 
 function Point(x, y) {
     this.x = x;
@@ -27,23 +33,13 @@ function Path(sx, sy, ex, ey, arc, dir) {
     this.e2 = new Point(ex, ey);
     this.cc = new Point(sx + arc * cmultx, ey + arc * cmulty);
     this.cr = arc;
-    if (dir == D_UL) {
-        this.cs1 = 0;
-        this.cs2 = -Math.PI/2;
-        this.cs3 = true;
-    } else if (dir == D_UR) {
-        this.cs1 = Math.PI,
-        this.cs2 = -Math.PI/2;
-        this.cs3 = false;
-    } else if (dir == D_DR) {
-        this.cs1 = Math.PI,
-        this.cs2 = Math.PI/2;
-        this.cs3 = true;
-    } else if (dir == D_DL) {
-        this.cs1 = 0,
-        this.cs2 = Math.PI/2;
-        this.cs3 = false;
-    }
+
+    if (dir == D_UL || dir == D_DL) this.cs1 = 0;
+    else if (dir == D_UR || dir == D_DR) this.cs1 = Math.PI;
+
+    this.cs3 = dir == D_UL || dir == D_DR;
+
+    this.cs2 = this.cs1 + (this.cs3? -1 : 1)*Math.PI/2;
     this.dir = dir;
 
     this.len = function() {
@@ -60,13 +56,25 @@ function load() {
 
     engine = new Engine('canvas', false);
 
-    p = null;
+    ps = [];
+    cs = [];
 
     engine.init = function() {
 
     };
 
     engine.update = function(delta) {
+
+        for (let c of cs) {
+            let p = ps[c.pro_i];
+
+            c.pro += 4
+
+            if (c.pro >= p.len()) {
+                c.pro = 0;
+                c.pro_i = (Math.random() * ps.length) | 0;
+            }
+        }
 
     };
 
@@ -76,6 +84,9 @@ function load() {
 
         g.fillStyle = "#fff";
         g.fillRect(0, 0, w, h)
+        g.fillStyle = "#000";
+
+        if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
 
         for (let i=0; i<4; i++) {
             for (let p of ps) {
@@ -101,6 +112,38 @@ function load() {
             break;
         }
 
+        for (let c of cs) {
+            let p = ps[c.pro_i];
+
+            cur = c.pro;
+
+            if (cur < p.len_part(0)) {
+                prog = cur / p.len_part(0);
+
+                let x = p.s1.x + (p.e1.x - p.s1.x) * prog;
+                let y = p.s1.y + (p.e1.y - p.s1.y) * prog;
+
+                g.fillRect(x -5, y -5, 10, 10)
+
+            } else if (cur < p.len_part(0) + p.len_part(1)) {
+
+                prog = (cur - p.len_part(0)) / p.len_part(1);
+
+                let x = p.e1.x + (p.s2.x - p.e1.x) * prog;
+                let y = p.e1.y + (p.s2.y - p.e1.y) * prog;
+
+                g.fillRect(x -5, y -5, 10, 10)
+
+            } else {
+                prog = (cur - p.len_part(0) - p.len_part(1)) / p.len_part(2);
+
+                let x = p.s2.x + (p.e2.x - p.s2.x) * prog;
+                let y = p.s2.y + (p.e2.y - p.s2.y) * prog;
+
+                g.fillRect(x -5, y -5, 10, 10)
+            }
+        }
+
     };
 
     engine.resize = function() {
@@ -122,9 +165,26 @@ function load() {
             new Path(w/2 - hrs, 0, w/2 - hrs, h , 0, D_D),
             new Path(w/2 - hrs, 0, 0, h/2 - hrs , rtb, D_DL),
         ]
+
+        cs = [];
+        for (let i=0; i<20; i++) {
+            let p_i = (Math.random() * ps.length) | 0;
+            cs.push({
+                pro: Math.random() * ps[p_i].len(),
+                pro_i: p_i
+            });
+        }
     };
 
     engine.mouseDown = function(e) {
+
+        for (let i=0; i<10; i++) {
+            let p_i = (Math.random() * ps.length) | 0;
+            cs.push({
+                pro: -Math.random() * ps[p_i].len(),
+                pro_i: p_i
+            });
+        }
 
         console.log(e.offsetX, e.offsetY);
     };
