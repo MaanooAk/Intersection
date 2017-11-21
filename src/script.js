@@ -126,19 +126,51 @@ function Car(ps, ss) {
 
 function Master(ps, cs, ss) {
 
-    this.sigSetRed = function(i) {
-        ss[i].setRed();
+    this.ps = ps;
+    this.cs = cs;
+    this.ss = ss;
 
-        for (let c of cs) {
+    this.red = function(i) {
+        this.ss[i].setRed();
+
+        for (let c of this.cs) {
             if (c.pro_i == i) {
-                c.qi = ss[c.pro_i].q++;
+                c.qi = this.ss[c.pro_i].q++;
             }
         }
     }
 
-    this.sigSetGre = function(i) {
-        ss[i].setGre();
+    this.gre = function(i) {
+        this.ss[i].setGre();
 
+    }
+
+    this.sig = function(c, i) {
+        if (c == S_GRE) this.gre(i);
+        else if (c == S_RED) this.red(i);
+    }
+
+    this.m_corners = function(c) {
+        this.sig(c, P_D0);
+        this.sig(c, P_U0);
+        this.sig(c, P_R0);
+        this.sig(c, P_L0);
+    }
+
+    this.m_line = function(c, i) {
+        if (i == true) {
+            this.sig(c, P_D1);
+            this.sig(c, P_U1);
+        } else {
+            this.sig(c, P_R1);
+            this.sig(c, P_L1);
+        }
+    }
+
+    this.m_all = function(c) {
+        for (let i=0; i<12; i++) {
+            this.sig(c, i);
+        }
     }
 
 }
