@@ -35,7 +35,15 @@ body {
 			<button onclick="master.m_line(S_RED, false)">X</button>
 			<button onclick="master.m_line(S_GRE, false)">line -</button>
 		</div>
-		<div><button onclick="setInterval(engine.mouseDown, 100)">setInterval(engine.mouseDown, 100)</button></div>
+		<div>
+			<button onclick="master.m_curve(S_RED, true)">X</button>
+			<button onclick="master.m_curve(S_GRE, true)">curve \</button>
+		</div>
+		<div>
+			<button onclick="master.m_curve(S_RED, false)">X</button>
+			<button onclick="master.m_curve(S_GRE, false)">curve /</button>
+		</div>
+		<div><button onclick="setInterval(engine.mouseDown, 100)">traffic</button></div>
 	</div>
 
 	<canvas id="canvas" width="600" height="600"></canvas>
