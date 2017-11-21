@@ -11,6 +11,7 @@ const D_LD = 8;
 const D_R = 9;
 const D_RU = 10;
 const D_RD = 11;
+const D_SWAP = 6;
 
 function Point(x, y) {
     this.x = x;
@@ -24,20 +25,35 @@ function Point(x, y) {
 
 function Path(sx, sy, ex, ey, arc, dir) {
 
-    let cmultx = dir == D_UL || dir == D_DL ? -1 : 1;
-    let cmulty = dir == D_DR || dir == D_DL ? -1 : 1;
 
-    this.s1 = new Point(sx, sy);
-    this.e1 = new Point(sx, ey + arc * cmulty);
-    this.s2 = new Point(sx + arc * cmultx, ey);
-    this.e2 = new Point(ex, ey);
-    this.cc = new Point(sx + arc * cmultx, ey + arc * cmulty);
-    this.cr = arc;
+    if (dir < D_SWAP) {
+        let cmultx = dir == D_UL || dir == D_DL ? -1 : 1;
+        let cmulty = dir == D_DR || dir == D_DL ? -1 : 1;
+
+        this.s1 = new Point(sx, sy);
+        this.e1 = new Point(sx, ey + arc * cmulty);
+        this.s2 = new Point(sx + arc * cmultx, ey);
+        this.e2 = new Point(ex, ey);
+        this.cc = new Point(sx + arc * cmultx, ey + arc * cmulty);
+        this.cr = arc;
+    } else {
+        let cmultx = dir == D_LD || dir == D_LU ? -1 : 1;
+        let cmulty = dir == D_RU || dir == D_LU ? -1 : 1;
+
+        this.s1 = new Point(sx, sy);
+        this.e1 = new Point(ex + arc * cmultx, sy);
+        this.s2 = new Point(ex, sy + arc * cmulty);
+        this.e2 = new Point(ex, ey);
+        this.cc = new Point(ex + arc * cmultx, sy + arc * cmulty);
+        this.cr = arc;
+    }
 
     if (dir == D_UL || dir == D_DL) this.cs1 = 0;
     else if (dir == D_UR || dir == D_DR) this.cs1 = Math.PI;
+    else if (dir == D_LU || dir == D_RU) this.cs1 = Math.PI/2;
+    else if (dir == D_LD || dir == D_RD) this.cs1 = 3*Math.PI/2;
 
-    this.cs3 = dir == D_UL || dir == D_DR;
+    this.cs3 = dir == D_UL || dir == D_DR || dir == D_LU || dir == D_RD;
 
     this.cs2 = this.cs1 + (this.cs3? -1 : 1)*Math.PI/2;
     this.dir = dir;
@@ -171,6 +187,14 @@ function load() {
             new Path(w/2 - hrs + ls, 0, w, h/2 + hrs - ls, rtb, D_DR),
             new Path(w/2 - hrs, 0, w/2 - hrs, h , 0, D_D),
             new Path(w/2 - hrs - ls, 0, 0, h/2 - hrs - ls, rts, D_DL),
+
+            new Path(0, h/2 + hrs -ls, w/2 + hrs -ls, 0, rtb, D_LU),
+            new Path(0, h/2 + hrs, w, h/2 + hrs, 0, D_L),
+            new Path(0, h/2 + hrs +ls, w/2 - hrs -ls, h, rts, D_LD),
+
+            new Path(w, h/2 - hrs -ls, w/2 + hrs +ls, 0, rts, D_RU),
+            new Path(w, h/2 - hrs, 0, h/2 - hrs, 0, D_R),
+            new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD),
         ]
 
         cs = [];
