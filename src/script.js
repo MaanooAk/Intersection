@@ -102,25 +102,41 @@ function Signal() {
     };
 }
 
-function Car(ps, ss) {
+function Car(p_i, ps, ss) {
 
-    this.pro_i = (Math.random() * ps.length) | 0;
+    this.a = true;
+
+    this.pro_i = p_i;
     this.pro = 0;
 
     this.speed = 4;
     this.mspeed = 4;
 
     this.qi = ss[this.pro_i].q++;
-    this.pro = -this.qi * 100;
 
-    this.reset = function() {
-        this.pro_i = (Math.random() * ps.length) | 0;
-        this.pro = 0;
+    this.die = function() {
+        this.a = false;
+    }
+}
 
-        this.speed = 4;
-        this.mspeed = 4;
+function Input(p_i) {
 
-        this.qi = ss[this.pro_i].q++;
+    this.p_i = p_i;
+    this.count = 0;
+    this.last_car = null;
+
+    this.can_add = function() {
+        if (this.count == 0) return false;
+        if (this.last_car == null) return true;
+
+        //this.last_car.speed == this.last_car.mspeed && 
+        return this.last_car.pro > 30;
+    }
+
+    this.add = function(ps, cs, ss) {
+        this.count -= 1;
+        this.last_car = new Car(this.p_i, ps, ss)
+        cs.push(this.last_car);
     }
 }
 
@@ -131,12 +147,22 @@ function Master(ps, cs, ss) {
     this.ss = ss;
 
     this.red = function(i) {
-        this.ss[i].setRed();
+        let s = this.ss[i];
+        let p = this.ps[i];
 
+        s.setRed();
+
+        let l = [];
         for (let c of this.cs) {
-            if (c.pro_i == i) {
-                c.qi = this.ss[c.pro_i].q++;
+            if (c.pro_i == i && c.pro < p.sig) {
+                l.push(c);
             }
+        }
+
+        l.sort(function (a, b) { return b.pro - a.pro; });
+
+        for (let c of l) {
+            c.qi = this.ss[i].q++;
         }
     }
 
@@ -182,6 +208,7 @@ function load() {
     ps = [];
     cs = [];
     ss = [];
+    is = [];
     master = new Master(ps, cs, ss);
 
     engine.init = function() {
@@ -190,19 +217,24 @@ function load() {
 
     engine.update = function(delta) {
 
+        for (let i of is) {
+            if (i.can_add()) {
+                i.add(ps, cs, ss);
+            }
+        }
+
         for (let c of cs) {
+            if (!c.a) continue;
             let p = ps[c.pro_i];
             let s = ss[c.pro_i];
 
             let stop = p.sig - 30 * c.qi;
-            if (s.s == S_RED && c.speed > 0 && stop - c.pro < 100) {
+            if (s.s == S_RED && c.pro <= p.sig && c.speed > 0 && stop - c.pro < 100) {
                 c.speed = c.mspeed * (stop - c.pro) / 100;
                 if (c.speed < 0) {
                     c.speed = 0;
                 }
-            }
-
-            if (s.s == S_GRE && c.speed < c.mspeed) {
+            } else if (c.speed < c.mspeed) {
                 c.speed += c.mspeed / 100;
                 if (c.speed > c.mspeed) {
                     c.speed = c.mspeed;
@@ -211,8 +243,8 @@ function load() {
 
             c.pro += c.speed;
 
-            if (c.pro >= p.len) {
-                c.reset();
+            if (c.pro >= p.len + 30) {
+                c.die();
             }
         }
 
@@ -328,13 +360,16 @@ function load() {
             new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD, sigw),
         ]
 
+        let i = 0;
         for (let p of ps) {
             ss.push(new Signal());
+            is.push(new Input(i));
+            i += 1;
         }
 
         cs = [];
         for (let i=0; i<20; i++) {
-            cs.push(new Car(ps, ss));
+            is[(Math.random() * ps.length) | 0].count += 1;
         }
 
         master = new Master(ps, cs, ss);
@@ -343,7 +378,7 @@ function load() {
     engine.mouseDown = function(e) {
 
         for (let i=0; i<1; i++) {
-            cs.push(new Car(ps, ss));
+            is[(Math.random() * ps.length) | 0].count += 1;
         }
 
         // console.log(e.offsetX, e.offsetY);
