@@ -114,6 +114,8 @@ function Car(p_i, ps, ss) {
 
     this.qi = ss[this.pro_i].q++;
 
+    this.next = null;
+
     this.die = function() {
         this.a = false;
     }
@@ -129,13 +131,19 @@ function Input(p_i) {
         if (this.count == 0) return false;
         if (this.last_car == null) return true;
 
-        //this.last_car.speed == this.last_car.mspeed && 
+        //this.last_car.speed == this.last_car.mspeed &&
         return this.last_car.pro > 30;
     }
 
     this.add = function(ps, cs, ss) {
         this.count -= 1;
-        this.last_car = new Car(this.p_i, ps, ss)
+        let ncar = new Car(this.p_i, ps, ss);
+
+        if (this.last_car != null) {
+            ncar.speed = this.last_car.speed;
+            ncar.next = this.last_car;
+        }
+        this.last_car = ncar;
         cs.push(this.last_car);
     }
 }
@@ -190,6 +198,16 @@ function Master(ps, cs, ss) {
         } else {
             this.sig(c, P_R1);
             this.sig(c, P_L1);
+        }
+    }
+
+    this.m_curve = function(c, i) {
+        if (i == true) {
+            this.sig(c, P_D2);
+            this.sig(c, P_U2);
+        } else {
+            this.sig(c, P_R2);
+            this.sig(c, P_L2);
         }
     }
 
