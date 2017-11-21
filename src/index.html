@@ -10,6 +10,11 @@ body {
 	margin: 0;
 	overflow: hidden;
 }
+.panel {
+	position: fixed;
+	bottom: 5px;
+	left: 5px;
+}
 	</style>
 
 	<script src="engine.js"></script>
@@ -18,32 +23,41 @@ body {
 </head>
 <body onload="load()">
 
-	<div style="position: fixed">
+	<div class="panel">
 		<div>
-			<button onclick="master.m_all(S_RED)">X</button>
-			<button onclick="master.m_all(S_GRE)">all</button>
+			<button onclick="master.m_all(S_RED)">red</button>
 		</div>
 		<div>
-			<button onclick="master.m_corners(S_RED)">X</button>
 			<button onclick="master.m_corners(S_GRE)">corners</button>
 		</div>
 		<div>
-			<button onclick="master.m_line(S_RED, true)">X</button>
 			<button onclick="master.m_line(S_GRE, true)">line |</button>
-		</div>
-		<div>
-			<button onclick="master.m_line(S_RED, false)">X</button>
 			<button onclick="master.m_line(S_GRE, false)">line -</button>
 		</div>
 		<div>
-			<button onclick="master.m_curve(S_RED, true)">X</button>
 			<button onclick="master.m_curve(S_GRE, true)">curve \</button>
-		</div>
-		<div>
-			<button onclick="master.m_curve(S_RED, false)">X</button>
 			<button onclick="master.m_curve(S_GRE, false)">curve /</button>
 		</div>
-		<div><button onclick="setInterval(engine.mouseDown, 100)">traffic</button></div>
+		<div>
+			<button onclick="master.m_cla(S_GRE, 0)">cla \|</button>
+			<button onclick="master.m_cla(S_GRE, 1)">cla |\</button>
+		</div>
+		<div>
+			<button onclick="master.m_cla(S_GRE, 2)">cla &gt;</button>
+			<button onclick="master.m_cla(S_GRE, 3)">cla &lt;</button>
+		</div>
+		<div>
+			<button onclick="master.m_spe(S_GRE, 0)">spe /|</button>
+			<button onclick="master.m_spe(S_GRE, 1)">spe |/</button>
+		</div>
+		<div>
+			<button onclick="master.m_spe(S_GRE, 2)">spe &gt;</button>
+			<button onclick="master.m_spe(S_GRE, 3)">spe &lt;</button>
+		</div>
+		<div>
+			<button onclick="setInterval(engine.mouseDown, 100)">interval</button>
+			<button onclick="for(let i of is) i.count = -1;">inf</button>
+		</div>
 	</div>
 
 	<canvas id="canvas" width="600" height="600"></canvas>
