@@ -45,6 +45,10 @@ COL[P_L0] = [];
 COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
 COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
 
+var opts = {
+    sync_start: false
+}
+
 function Point(x, y) {
     this.x = x;
     this.y = y;
@@ -326,9 +330,23 @@ function load() {
                     c.speed = 0;
                 }
             } else if (c.speed < c.mspeed) {
-                c.speed += c.mspeed / 100;
-                if (c.speed > c.mspeed) {
-                    c.speed = c.mspeed;
+
+                let perf = true;
+                if (!opts.sync_start) {
+                    perf = c.next == null || c.next.pro >= c.pro + 35;
+                }
+
+                if (perf) {
+
+                    c.speed += c.mspeed / 100;
+                    if (c.speed > c.mspeed) {
+                        c.speed = c.mspeed;
+                    }
+                } else {
+
+                    if (c.next != null && c.next.speed < c.speed) {
+                        c.speed -= c.mspeed / 100;
+                    }
                 }
             }
 
