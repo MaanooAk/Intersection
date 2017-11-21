@@ -108,11 +108,15 @@ function Signal() {
     this.q = 0;
 
     this.setGre = function() {
+        if (this.s == S_GRE) return false;
         this.s = S_GRE;
+        return true;
     };
     this.setRed = function() {
+        if (this.s == S_RED) return false;
         this.s = S_RED;
         this.q = 0;
+        return true;
     };
 }
 
@@ -172,10 +176,12 @@ function Master(ps, cs, ss) {
         let s = this.ss[i];
         let p = this.ps[i];
 
+        //if(!s.setRed()) return;
         s.setRed();
 
         let l = [];
         for (let c of this.cs) {
+            if (!c.a) continue;
             if (c.pro_i == i && c.pro < p.sig) {
                 l.push(c);
             }
@@ -189,12 +195,14 @@ function Master(ps, cs, ss) {
     }
 
     this.gre = function(i) {
+        let s = this.ss[i];
+        let p = this.ps[i];
 
         for (let ci of COL[i]) {
             if (this.ss[ci].s == S_GRE) this.red(ci);
         }
 
-        this.ss[i].setGre();
+        if(!s.setGre()) return;
 
     }
 
@@ -286,6 +294,8 @@ function load() {
 
     engine.update = function(delta) {
 
+        for (let repeats=0; repeats<1; repeats++) {
+
         for (let i of is) {
             if (i.can_add()) {
                 i.add(ps, cs, ss);
@@ -298,9 +308,13 @@ function load() {
             let s = ss[c.pro_i];
 
             let stop = p.sig - 30 * c.qi;
-            if (s.s == S_RED && c.pro <= p.sig && c.speed > 0 && stop - c.pro < 100) {
-                c.speed = c.mspeed * (stop - c.pro) / 100;
-                if (c.speed < 0) {
+            if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 100) {
+                if (c.speed > 0 && stop - c.pro > 0) {
+                    c.speed = c.mspeed * (stop - c.pro) / 100;
+                    if (c.speed <= 0.01) {
+                        c.speed = 0;
+                    }
+                } else {
                     c.speed = 0;
                 }
             } else if (c.speed < c.mspeed) {
@@ -324,6 +338,8 @@ function load() {
             ocs = cs;
             cs = [];
             for (let i of ocs) if (i.a) cs.push(i);
+        }
+
         }
 
     };
@@ -360,6 +376,7 @@ function load() {
         }
 
         for (let c of cs) {
+            if (!c.a) continue;
             let p = ps[c.pro_i];
 
             cur = c.pro;
