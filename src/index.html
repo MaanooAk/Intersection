@@ -18,7 +18,28 @@ body {
 </head>
 <body onload="load()">
 
+	<div style="position: fixed">
+		<div>
+			<button onclick="master.m_all(S_RED)">X</button>
+			<button onclick="master.m_all(S_GRE)">all</button>
+		</div>
+		<div>
+			<button onclick="master.m_corners(S_RED)">X</button>
+			<button onclick="master.m_corners(S_GRE)">corners</button>
+		</div>
+		<div>
+			<button onclick="master.m_line(S_RED, true)">X</button>
+			<button onclick="master.m_line(S_GRE, true)">line |</button>
+		</div>
+		<div>
+			<button onclick="master.m_line(S_RED, false)">X</button>
+			<button onclick="master.m_line(S_GRE, false)">line -</button>
+		</div>
+		<div><button onclick="setInterval(engine.mouseDown, 100)">setInterval(engine.mouseDown, 100)</button></div>
+	</div>
+
 	<canvas id="canvas" width="600" height="600"></canvas>
+
 
 </body>
 </html>
