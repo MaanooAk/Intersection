@@ -18,6 +18,19 @@ const S_RED = 0;
 const S_YEL = 1;
 const S_GRE = 2;
 
+const P_D0 = 2;
+const P_D1 = 1;
+const P_D2 = 0;
+const P_U0 = 5;
+const P_U1 = 4;
+const P_U2 = 3;
+const P_R0 = 9;
+const P_R1 = 10;
+const P_R2 = 11;
+const P_L0 = 8;
+const P_L1 = 7;
+const P_L2 = 6;
+
 function Point(x, y) {
     this.x = x;
     this.y = y;
@@ -92,16 +105,22 @@ function Signal() {
 function Car(ps, ss) {
 
     this.pro_i = (Math.random() * ps.length) | 0;
-    this.pro = 0; //-Math.random() * ps[this.pro_i].len;
+    this.pro = 0;
 
     this.speed = 4;
     this.mspeed = 4;
 
     this.qi = ss[this.pro_i].q++;
+    this.pro = -this.qi * 100;
 
     this.reset = function() {
         this.pro_i = (Math.random() * ps.length) | 0;
         this.pro = 0;
+
+        this.speed = 4;
+        this.mspeed = 4;
+
+        this.qi = ss[this.pro_i].q++;
     }
 }
 
@@ -177,28 +196,25 @@ function load() {
 
         if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
 
-        for (let i=0; i<2; i++) {
-            for (let p of ps) {
+        let i = 0;
+        for (let p of ps) {
 
-                g.beginPath();
+            g.beginPath();
 
-                g.moveTo(p.s1.x, p.s1.y);
-                g.lineTo(p.e1.x, p.e1.y);
+            g.moveTo(p.s1.x, p.s1.y);
+            g.lineTo(p.e1.x, p.e1.y);
 
-                if (p.cr > 0) {
-                    g.arc(p.cc.x, p.cc.y, p.cr, p.cs1, p.cs2, p.cs3);
-                }
-
-                g.moveTo(p.s2.x, p.s2.y);
-                g.lineTo(p.e2.x, p.e2.y);
-
-                g.stroke();
-
+            if (p.cr > 0) {
+                g.arc(p.cc.x, p.cc.y, p.cr, p.cs1, p.cs2, p.cs3);
             }
-            g.translate(w/2, h/2);
-            // g.rotate(Math.PI/2);
-            g.translate(-w/2, -h/2);
-            break;
+
+            g.moveTo(p.s2.x, p.s2.y);
+            g.lineTo(p.e2.x, p.e2.y);
+
+            g.stroke();
+
+            //g.fillText(i++, p.e1.x, p.e1.y);
+
         }
 
         for (let c of cs) {
