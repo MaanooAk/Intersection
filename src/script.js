@@ -159,17 +159,18 @@ function load() {
         let s = 100;
         let rs = 50;
         let hrs = 25;
+        let ls = 12;
         let rtb = 100;
         let rts = rtb-rs;
 
         ps = [
-            new Path(w/2 + hrs, h, 0, h/2 - hrs , rtb, D_UL),
+            new Path(w/2 + hrs - ls, h, 0, h/2 - hrs + ls, rtb, D_UL),
             new Path(w/2 + hrs, h, w/2 + hrs, 0, D_U),
-            new Path(w/2 + hrs, h, w, h/2 + hrs, rts, D_UR),
+            new Path(w/2 + hrs + ls, h, w, h/2 + hrs + ls, rts, D_UR),
 
-            new Path(w/2 - hrs, 0, w, h/2 + hrs , rtb, D_DR),
+            new Path(w/2 - hrs + ls, 0, w, h/2 + hrs - ls, rtb, D_DR),
             new Path(w/2 - hrs, 0, w/2 - hrs, h , 0, D_D),
-            new Path(w/2 - hrs, 0, 0, h/2 - hrs , rts, D_DL),
+            new Path(w/2 - hrs - ls, 0, 0, h/2 - hrs - ls, rts, D_DL),
         ]
 
         cs = [];
