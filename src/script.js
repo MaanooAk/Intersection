@@ -11,7 +11,12 @@ const D_LD = 8;
 const D_R = 9;
 const D_RU = 10;
 const D_RD = 11;
+
 const D_SWAP = 6;
+
+const S_RED = 0;
+const S_YEL = 1;
+const S_GRE = 2;
 
 function Point(x, y) {
     this.x = x;
@@ -23,7 +28,7 @@ function Point(x, y) {
     }
 }
 
-function Path(sx, sy, ex, ey, arc, dir) {
+function Path(sx, sy, ex, ey, arc, dir, sig) {
 
     if (dir < D_SWAP) {
         let cmultx = dir == D_UL || dir == D_DL ? -1 : 1;
@@ -56,6 +61,7 @@ function Path(sx, sy, ex, ey, arc, dir) {
 
     this.cs2 = this.cs1 + (this.cs3? -1 : 1)*Math.PI/2;
     this.dir = dir;
+    this.sig = sig;
 
     this.len1 = this.s1.dis(this.e1);
     this.len2 = 0.5*Math.PI*this.cr;
@@ -69,18 +75,53 @@ function Path(sx, sy, ex, ey, arc, dir) {
     }
 }
 
-function Car(ps) {
+function Signal() {
+
+    this.s = S_RED;
+    this.q = 0;
+
+    this.setGre = function() {
+        this.s = S_GRE;
+    };
+    this.setRed = function() {
+        this.s = S_RED;
+        this.q = 0;
+    };
+}
+
+function Car(ps, ss) {
 
     this.pro_i = (Math.random() * ps.length) | 0;
-    this.pro = Math.random() * ps[this.pro_i].len;
+    this.pro = 0; //-Math.random() * ps[this.pro_i].len;
 
     this.speed = 4;
     this.mspeed = 4;
+
+    this.qi = ss[this.pro_i].q++;
 
     this.reset = function() {
         this.pro_i = (Math.random() * ps.length) | 0;
         this.pro = 0;
     }
+}
+
+function Master(ps, cs, ss) {
+
+    this.sigSetRed = function(i) {
+        ss[i].setRed();
+
+        for (let c of cs) {
+            if (c.pro_i == i) {
+                c.qi = ss[c.pro_i].q++;
+            }
+        }
+    }
+
+    this.sigSetGre = function(i) {
+        ss[i].setGre();
+
+    }
+
 }
 
 function load() {
@@ -89,6 +130,8 @@ function load() {
 
     ps = [];
     cs = [];
+    ss = [];
+    master = new Master(ps, cs, ss);
 
     engine.init = function() {
 
@@ -98,6 +141,22 @@ function load() {
 
         for (let c of cs) {
             let p = ps[c.pro_i];
+            let s = ss[c.pro_i];
+
+            let stop = p.sig - 30 * c.qi;
+            if (s.s == S_RED && c.speed > 0 && stop - c.pro < 100) {
+                c.speed = c.mspeed * (stop - c.pro) / 100;
+                if (c.speed < 0) {
+                    c.speed = 0;
+                }
+            }
+
+            if (s.s == S_GRE && c.speed < c.mspeed) {
+                c.speed += c.mspeed / 100;
+                if (c.speed > c.mspeed) {
+                    c.speed = c.mspeed;
+                }
+            }
 
             c.pro += c.speed;
 
@@ -200,38 +259,46 @@ function load() {
         let ls = 12;
         let rtb = 100;
         let rts = rtb-rs;
+        let sigw = w/2 -rtb;
+        let sigh = h/2 -rtb;
 
         ps = [
-            new Path(w/2 + hrs - ls, h, 0, h/2 - hrs + ls, rtb, D_UL),
-            new Path(w/2 + hrs, h, w/2 + hrs, 0, D_U),
-            new Path(w/2 + hrs + ls, h, w, h/2 + hrs + ls, rts, D_UR),
+            new Path(w/2 + hrs - ls, h, 0, h/2 - hrs + ls, rtb, D_UL, sigh),
+            new Path(w/2 + hrs, h, w/2 + hrs, 0, 0, D_U, sigh),
+            new Path(w/2 + hrs + ls, h, w, h/2 + hrs + ls, rts, D_UR, sigh),
 
-            new Path(w/2 - hrs + ls, 0, w, h/2 + hrs - ls, rtb, D_DR),
-            new Path(w/2 - hrs, 0, w/2 - hrs, h , 0, D_D),
-            new Path(w/2 - hrs - ls, 0, 0, h/2 - hrs - ls, rts, D_DL),
+            new Path(w/2 - hrs + ls, 0, w, h/2 + hrs - ls, rtb, D_DR, sigh),
+            new Path(w/2 - hrs, 0, w/2 - hrs, h, 0, D_D, sigh),
+            new Path(w/2 - hrs - ls, 0, 0, h/2 - hrs - ls, rts, D_DL, sigh),
 
-            new Path(0, h/2 + hrs -ls, w/2 + hrs -ls, 0, rtb, D_LU),
-            new Path(0, h/2 + hrs, w, h/2 + hrs, 0, D_L),
-            new Path(0, h/2 + hrs +ls, w/2 - hrs -ls, h, rts, D_LD),
+            new Path(0, h/2 + hrs -ls, w/2 + hrs -ls, 0, rtb, D_LU, sigw),
+            new Path(0, h/2 + hrs, w, h/2 + hrs, 0, D_L, sigw),
+            new Path(0, h/2 + hrs +ls, w/2 - hrs -ls, h, rts, D_LD, sigw),
 
-            new Path(w, h/2 - hrs -ls, w/2 + hrs +ls, 0, rts, D_RU),
-            new Path(w, h/2 - hrs, 0, h/2 - hrs, 0, D_R),
-            new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD),
+            new Path(w, h/2 - hrs -ls, w/2 + hrs +ls, 0, rts, D_RU, sigw),
+            new Path(w, h/2 - hrs, 0, h/2 - hrs, 0, D_R, sigw),
+            new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD, sigw),
         ]
+
+        for (let p of ps) {
+            ss.push(new Signal());
+        }
 
         cs = [];
         for (let i=0; i<20; i++) {
-            cs.push(new Car(ps));
+            cs.push(new Car(ps, ss));
         }
+
+        master = new Master(ps, cs, ss);
     };
 
     engine.mouseDown = function(e) {
 
-        for (let i=0; i<10; i++) {
-            cs.push(new Car(ps));
+        for (let i=0; i<1; i++) {
+            cs.push(new Car(ps, ss));
         }
 
-        console.log(e.offsetX, e.offsetY);
+        // console.log(e.offsetX, e.offsetY);
     };
 
     engine.mouseMove = function(e) { };
