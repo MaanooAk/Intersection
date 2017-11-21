@@ -25,7 +25,6 @@ function Point(x, y) {
 
 function Path(sx, sy, ex, ey, arc, dir) {
 
-
     if (dir < D_SWAP) {
         let cmultx = dir == D_UL || dir == D_DL ? -1 : 1;
         let cmulty = dir == D_DR || dir == D_DL ? -1 : 1;
@@ -58,19 +57,35 @@ function Path(sx, sy, ex, ey, arc, dir) {
     this.cs2 = this.cs1 + (this.cs3? -1 : 1)*Math.PI/2;
     this.dir = dir;
 
-    this.len = function() {
-        return this.s1.dis(this.e1) + this.s2.dis(this.e2) + 0.5*Math.PI*this.cr;
-    }
+    this.len1 = this.s1.dis(this.e1);
+    this.len2 = 0.5*Math.PI*this.cr;
+    this.len3 = this.s2.dis(this.e2);
+    this.len = this.len1 + this.len2 + this.len3;
+
     this.len_part = function(index) {
-        if (index == 0) return this.s1.dis(this.e1);
-        if (index == 1) return 0.5*Math.PI*this.cr;
-        if (index == 2) return this.s2.dis(this.e2);
+        if (index == 0) return this.len1;
+        if (index == 1) return this.len2;
+        if (index == 2) return this.len3;
+    }
+}
+
+function Car(ps) {
+
+    this.pro_i = (Math.random() * ps.length) | 0;
+    this.pro = Math.random() * ps[this.pro_i].len;
+
+    this.speed = 4;
+    this.mspeed = 4;
+
+    this.reset = function() {
+        this.pro_i = (Math.random() * ps.length) | 0;
+        this.pro = 0;
     }
 }
 
 function load() {
 
-    engine = new Engine('canvas', false);
+    engine = new Engine('canvas', true);
 
     ps = [];
     cs = [];
@@ -84,11 +99,10 @@ function load() {
         for (let c of cs) {
             let p = ps[c.pro_i];
 
-            c.pro += 4
+            c.pro += c.speed;
 
-            if (c.pro >= p.len()) {
-                c.pro = 0;
-                c.pro_i = (Math.random() * ps.length) | 0;
+            if (c.pro >= p.len) {
+                c.reset();
             }
         }
 
@@ -139,7 +153,11 @@ function load() {
                 let x = p.s1.x + (p.e1.x - p.s1.x) * prog;
                 let y = p.s1.y + (p.e1.y - p.s1.y) * prog;
 
-                g.fillRect(x -5, y -10, 10, 20)
+                if (p.dir < D_SWAP) {
+                    g.fillRect(x -5, y -10, 10, 20)
+                } else {
+                    g.fillRect(x -10, y -5, 20, 10)
+                }
 
             } else if (cur < p.len_part(0) + p.len_part(1)) {
 
@@ -162,7 +180,11 @@ function load() {
                 let x = p.s2.x + (p.e2.x - p.s2.x) * prog;
                 let y = p.s2.y + (p.e2.y - p.s2.y) * prog;
 
-                g.fillRect(x -10, y -5, 20, 10)
+                if (p.dir < D_SWAP) {
+                    g.fillRect(x -10, y -5, 20, 10)
+                } else {
+                    g.fillRect(x -5, y -10, 10, 20)
+                }
             }
         }
 
@@ -199,22 +221,14 @@ function load() {
 
         cs = [];
         for (let i=0; i<20; i++) {
-            let p_i = (Math.random() * ps.length) | 0;
-            cs.push({
-                pro: Math.random() * ps[p_i].len(),
-                pro_i: p_i
-            });
+            cs.push(new Car(ps));
         }
     };
 
     engine.mouseDown = function(e) {
 
         for (let i=0; i<10; i++) {
-            let p_i = (Math.random() * ps.length) | 0;
-            cs.push({
-                pro: -Math.random() * ps[p_i].len(),
-                pro_i: p_i
-            });
+            cs.push(new Car(ps));
         }
 
         console.log(e.offsetX, e.offsetY);
