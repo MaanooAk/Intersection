@@ -31,6 +31,20 @@ const P_L0 = 8;
 const P_L1 = 7;
 const P_L2 = 6;
 
+var COL = {};
+COL[P_D0] = [];
+COL[P_D1] = [P_U2, P_R1, P_R2, P_L1];
+COL[P_D2] = [P_U1, P_R2, P_L1, P_L2];
+COL[P_U0] = [];
+COL[P_U1] = [P_D2, P_R1, P_L1, P_L2];
+COL[P_U2] = [P_D1, P_R2, P_R1, P_L2];
+COL[P_R0] = [];
+COL[P_R1] = [P_D1, P_U1, P_U2, P_L2];
+COL[P_R2] = [P_D1, P_D2, P_U2, P_L1];
+COL[P_L0] = [];
+COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
+COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
+
 function Point(x, y) {
     this.x = x;
     this.y = y;
@@ -175,6 +189,11 @@ function Master(ps, cs, ss) {
     }
 
     this.gre = function(i) {
+
+        for (let ci of COL[i]) {
+            if (this.ss[ci].s == S_GRE) this.red(ci);
+        }
+
         this.ss[i].setGre();
 
     }
@@ -208,6 +227,38 @@ function Master(ps, cs, ss) {
         } else {
             this.sig(c, P_R2);
             this.sig(c, P_L2);
+        }
+    }
+
+    this.m_cla = function(c, i) {
+        if (i == 0) {
+            this.sig(c, P_D1);
+            this.sig(c, P_D2);
+        } else if (i == 1) {
+            this.sig(c, P_U1);
+            this.sig(c, P_U2);
+        } else if (i == 2) {
+            this.sig(c, P_R1);
+            this.sig(c, P_R2);
+        } else if (i == 3) {
+            this.sig(c, P_L1);
+            this.sig(c, P_L2);
+        }
+    }
+
+    this.m_spe = function(c, i) {
+        if (i == 0) {
+            this.sig(c, P_D1);
+            this.sig(c, P_L2);
+        } else if (i == 1) {
+            this.sig(c, P_U1);
+            this.sig(c, P_R2);
+        } else if (i == 2) {
+            this.sig(c, P_L1);
+            this.sig(c, P_U2);
+        } else if (i == 3) {
+            this.sig(c, P_R1);
+            this.sig(c, P_D2);
         }
     }
 
@@ -264,6 +315,15 @@ function load() {
             if (c.pro >= p.len + 30) {
                 c.die();
             }
+        }
+
+        // clean up
+
+        // TODO move to function
+        if (cs.length > 500) {
+            ocs = cs;
+            cs = [];
+            for (let i of ocs) if (i.a) cs.push(i);
         }
 
     };
