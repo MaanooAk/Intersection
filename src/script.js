@@ -45,8 +45,17 @@ COL[P_L0] = [];
 COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
 COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
 
+const M_LIN = 0;
+const M_CUR = 1;
+const M_CLA = 2;
+const M_SPE = 3;
+
 var opts = {
     sync_start: false
+}
+
+function rnd(c) {
+    return (Math.random() * c) | 0;
 }
 
 function Point(x, y) {
@@ -231,7 +240,7 @@ function Master(ps, cs, ss) {
     }
 
     this.m_line = function(c, i) {
-        if (i == true) {
+        if (i == true || i == 1) {
             this.sig(c, P_D1);
             this.sig(c, P_U1);
         } else {
@@ -288,6 +297,56 @@ function Master(ps, cs, ss) {
         }
     }
 
+    this.m = function(i, ii) {
+        const c = S_GRE;
+        if (i == M_LIN) this.m_line(c, ii);
+        else if (i == M_CUR) this.m_curve(c, ii);
+        else if (i == M_CLA) this.m_cla(c, ii);
+        else if (i == M_SPE) this.m_spe(c, ii);
+    }
+}
+
+function Handler(master) {
+    this.master = master;
+
+    this.config = [
+        [200, M_CLA, 0],
+        [200, M_LIN, 1],
+        [200, M_CLA, 1],
+        [200, M_CLA, 3],
+        [200, M_LIN, 0],
+        [200, M_CLA, 2],
+    ];
+    this.ci = 0;
+
+    this.t = 0;
+    // this.tm = 0;
+    // for (let i of this.config) this.tm += i[0];
+
+    this.start = function() {
+        this.ci = 0;
+        this.t = 0;
+
+        this.master.m_corners(S_GRE);
+        this.perform();
+    }
+
+    this.update = function() {
+        this.t += 1;
+
+        if (this.t >= this.config[this.ci][0]) {
+            this.t = 0;
+            this.ci += 1;
+            if (this.ci >= this.config.length) this.ci = 0;
+
+            this.perform();
+        }
+    }
+
+    this.perform = function() {
+        let c = this.config[this.ci];
+        this.master.m(c[1], c[2]);
+    }
 }
 
 function load() {
@@ -298,15 +357,17 @@ function load() {
     cs = [];
     ss = [];
     is = [];
+
     master = new Master(ps, cs, ss);
+    handler = new Handler(master);
 
-    engine.init = function() {
-
-    };
+    engine.init = function() { };
 
     engine.update = function(delta) {
 
         for (let repeats=0; repeats<1; repeats++) {
+
+        handler.update(1);
 
         for (let i of is) {
             if (i.can_add()) {
@@ -498,16 +559,18 @@ function load() {
 
         cs = [];
         for (let i=0; i<20; i++) {
-            is[(Math.random() * ps.length) | 0].count += 1;
+            is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
         }
 
         master = new Master(ps, cs, ss);
+        handler = new Handler(master);
+        handler.start();
     };
 
     engine.mouseDown = function(e) {
 
         for (let i=0; i<1; i++) {
-            is[(Math.random() * ps.length) | 0].count += 1;
+            is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
         }
 
         // console.log(e.offsetX, e.offsetY);
