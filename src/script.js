@@ -31,19 +31,32 @@ const P_L0 = 8;
 const P_L1 = 7;
 const P_L2 = 6;
 
+// var COL = {};
+// COL[P_D0] = [];
+// COL[P_D1] = [P_U2, P_R1, P_R2, P_L1];
+// COL[P_D2] = [P_U1, P_R2, P_L1, P_L2];
+// COL[P_U0] = [];
+// COL[P_U1] = [P_D2, P_R1, P_L1, P_L2];
+// COL[P_U2] = [P_D1, P_R2, P_R1, P_L2];
+// COL[P_R0] = [];
+// COL[P_R1] = [P_D1, P_U1, P_U2, P_L2];
+// COL[P_R2] = [P_D1, P_D2, P_U2, P_L1];
+// COL[P_L0] = [];
+// COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
+// COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
 var COL = {};
-COL[P_D0] = [];
-COL[P_D1] = [P_U2, P_R1, P_R2, P_L1];
-COL[P_D2] = [P_U1, P_R2, P_L1, P_L2];
-COL[P_U0] = [];
-COL[P_U1] = [P_D2, P_R1, P_L1, P_L2];
-COL[P_U2] = [P_D1, P_R2, P_R1, P_L2];
-COL[P_R0] = [];
-COL[P_R1] = [P_D1, P_U1, P_U2, P_L2];
-COL[P_R2] = [P_D1, P_D2, P_U2, P_L1];
-COL[P_L0] = [];
-COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
-COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
+COL[P_D0] = [ P_L1, P_U2];
+COL[P_D1] = [P_U2, P_R1, P_R2, P_L1,  P_R0];
+COL[P_D2] = [P_U1, P_R2, P_L1, P_L2,  P_U0];
+COL[P_U0] = [ P_R1, P_D2];
+COL[P_U1] = [P_D2, P_R1, P_L1, P_L2,  P_L0];
+COL[P_U2] = [P_D1, P_R2, P_R1, P_L2,  P_D0];
+COL[P_R0] = [ P_D1, P_L2];
+COL[P_R1] = [P_D1, P_U1, P_U2, P_L2,  P_U0];
+COL[P_R2] = [P_D1, P_D2, P_U2, P_L1,  P_L0];
+COL[P_L0] = [ P_U1, P_R2];
+COL[P_L1] = [P_D1, P_D2, P_U1, P_R2,  P_D0];
+COL[P_L2] = [P_D2, P_U1, P_U2, P_R1,  P_R0];
 
 const M_LIN = 0;
 const M_CUR = 1;
@@ -51,7 +64,12 @@ const M_CLA = 2;
 const M_SPE = 3;
 
 var opts = {
-    sync_start: false
+    sync_start: false,
+    speed: 1,
+    show: {
+        lights: true,
+        wait: true,
+    }
 }
 
 function rnd(c) {
@@ -241,15 +259,18 @@ function Master(ps, cs, ss) {
 
     this.m_line = function(c, i) {
         if (i == true || i == 1) {
+            this.m_corners(c);
             this.sig(c, P_D1);
             this.sig(c, P_U1);
         } else {
+            this.m_corners(c);
             this.sig(c, P_R1);
             this.sig(c, P_L1);
         }
     }
 
     this.m_curve = function(c, i) {
+        this.m_corners(c);
         if (i == true) {
             this.sig(c, P_D2);
             this.sig(c, P_U2);
@@ -261,15 +282,19 @@ function Master(ps, cs, ss) {
 
     this.m_cla = function(c, i) {
         if (i == 0) {
+            this.m_corners(c);
             this.sig(c, P_D1);
             this.sig(c, P_D2);
         } else if (i == 1) {
+            this.m_corners(c);
             this.sig(c, P_U1);
             this.sig(c, P_U2);
         } else if (i == 2) {
+            this.m_corners(c);
             this.sig(c, P_R1);
             this.sig(c, P_R2);
         } else if (i == 3) {
+            this.m_corners(c);
             this.sig(c, P_L1);
             this.sig(c, P_L2);
         }
@@ -393,7 +418,7 @@ function load() {
 
     engine.update = function(delta) {
 
-        for (let repeats=0; repeats<1; repeats++) {
+        for (let repeats=0; repeats<opts.speed; repeats++) {
 
         handler.update(1);
 
@@ -497,17 +522,20 @@ function load() {
 
         }
 
-        g.strokeStyle = "#fcc";
-        g.lineWidth = 4;
-        renderer.draw_curves(g, ps, ss, S_RED);
+        if (opts.show.lights) {
 
-        g.strokeStyle = "#fff";
-        g.lineWidth = 9;
-        renderer.draw_curves(g, ps, ss, S_GRE);
+            g.strokeStyle = "#fcc";
+            g.lineWidth = 4;
+            renderer.draw_curves(g, ps, ss, S_RED);
 
-        g.strokeStyle = "#080";
-        g.lineWidth = 5;
-        renderer.draw_curves(g, ps, ss, S_GRE);
+            g.strokeStyle = "#fff";
+            g.lineWidth = 9;
+            renderer.draw_curves(g, ps, ss, S_GRE);
+
+            g.strokeStyle = "#080";
+            g.lineWidth = 5;
+            renderer.draw_curves(g, ps, ss, S_GRE);
+        }
 
         for (let c of cs) {
             if (!c.a) continue;
@@ -515,11 +543,12 @@ function load() {
 
             cur = c.pro;
 
-            // let durprog = c.durprog();
-            //
-            // if (durprog < 1.5) g.fillStyle = "#000";
-            // else if (durprog < 10) g.fillStyle = "rgb(" + ((durprog * 25)|0) + ", 0, 0)";
-            // else g.fillStyle = "#ff0000";
+            if (opts.show.wait) {
+                let durprog = c.durprog();
+
+                if (durprog < 20) g.fillStyle = "rgb(" + ((durprog * 255 / 20)|0) + ", 0, 0)";
+                else g.fillStyle = "#ff0000";
+            }
 
             if (cur < p.len_part(0)) {
                 prog = cur / p.len_part(0);
@@ -614,7 +643,7 @@ function load() {
 
     engine.mouseDown = function(e) {
 
-        for (let i=0; i<1; i++) {
+        for (let i=0; i<opts.speed; i++) {
             is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
         }
 
