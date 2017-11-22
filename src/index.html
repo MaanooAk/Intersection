@@ -12,12 +12,30 @@ body {
 	overflow: hidden;
 }
 
-.panel { position: fixed; }
+.panel {
+	position: fixed;
+}
 
 .bottom { bottom: 5px; }
 .up { up: 5px; }
 .right { right: 5px; text-align: right; }
 .left { left: 5px; }
+
+button {
+	margin: 3px 1px;
+}
+
+button.dire {
+	font-family: monospace;
+	font-size: 16px;
+	margin: 3px 1px;
+	min-width: 2.5em;;
+	text-align: center;
+    padding: 2px 4px;
+	border: none;
+    color: white;
+    background: darkslategrey;
+}
 
 	</style>
 
@@ -30,44 +48,41 @@ body {
 	<div class="panel bottom left">
 		<div>
 			<button onclick="master.m_all(S_RED)">red</button>
-		</div>
-		<div>
 			<button onclick="master.m_corners(S_GRE)">corners</button>
 		</div>
 		<div>
-			<button onclick="master.m_line(S_GRE, true)">line |</button>
-			<button onclick="master.m_line(S_GRE, false)">line -</button>
+			<button onclick="master.m_line(S_GRE, true)" class="dire">↑↓</button>
+			<button onclick="master.m_line(S_GRE, false)" class="dire">⇆</button>
 		</div>
 		<div>
-			<button onclick="master.m_curve(S_GRE, true)">curve \</button>
-			<button onclick="master.m_curve(S_GRE, false)">curve /</button>
+			<button onclick="master.m_curve(S_GRE, true)" class="dire">↖↘</button>
+			<button onclick="master.m_curve(S_GRE, false)" class="dire">↗↙</button>
 		</div>
 		<div>
-			<button onclick="master.m_cla(S_GRE, 0)">cla \|</button>
-			<button onclick="master.m_cla(S_GRE, 1)">cla |\</button>
+			<button onclick="master.m_cla(S_GRE, 0)" class="dire">↖↑</button>
+			<button onclick="master.m_cla(S_GRE, 1)" class="dire">↓↘</button>
+			<button onclick="master.m_cla(S_GRE, 2)" class="dire">←↙</button>
+			<button onclick="master.m_cla(S_GRE, 3)" class="dire">↗→</button>
 		</div>
 		<div>
-			<button onclick="master.m_cla(S_GRE, 2)">cla &gt;</button>
-			<button onclick="master.m_cla(S_GRE, 3)">cla &lt;</button>
+			<button onclick="master.m_spe(S_GRE, 0)" class="dire">↗↑</button>
+			<button onclick="master.m_spe(S_GRE, 1)" class="dire">↓↙</button>
+			<button onclick="master.m_spe(S_GRE, 2)" class="dire">→↘</button>
+			<button onclick="master.m_spe(S_GRE, 3)" class="dire">↖←</button>
 		</div>
-		<div>
-			<button onclick="master.m_spe(S_GRE, 0)">spe /|</button>
-			<button onclick="master.m_spe(S_GRE, 1)">spe |/</button>
-		</div>
-		<div>
-			<button onclick="master.m_spe(S_GRE, 2)">spe &gt;</button>
-			<button onclick="master.m_spe(S_GRE, 3)">spe &lt;</button>
-		</div>
+	</div>
+
+	<div class="panel bottom right">
 		<div>
 			<button onclick="setInterval(engine.mouseDown, 300)">interval</button>
 			<button onclick="for(let i of is) i.count = -1;">inf</button>
 		</div>
 		<div>
-			<button onclick="opts.speed = 1">x1</button>
-			<button onclick="opts.speed = 2">x2</button>
-			<button onclick="opts.speed = 3">x3</button>
-			<button onclick="opts.speed = 4">x4</button>
-			<button onclick="opts.speed = 8">x8</button>
+			<button onclick="opts.speed = 1" class="dire">x1</button>
+			<button onclick="opts.speed = 2" class="dire">x2</button>
+			<button onclick="opts.speed = 3" class="dire">x3</button>
+			<button onclick="opts.speed = 4" class="dire">x4</button>
+			<button onclick="opts.speed = 8" class="dire">x8</button>
 		</div>
 	</div>
 
