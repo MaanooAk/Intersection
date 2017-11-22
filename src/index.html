@@ -6,15 +6,19 @@
 	<title>Intersection</title>
 
 	<style>
+
 body {
 	margin: 0;
 	overflow: hidden;
 }
-.panel {
-	position: fixed;
-	bottom: 5px;
-	left: 5px;
-}
+
+.panel { position: fixed; }
+
+.bottom { bottom: 5px; }
+.up { up: 5px; }
+.right { right: 5px; text-align: right; }
+.left { left: 5px; }
+
 	</style>
 
 	<script src="engine.js"></script>
@@ -23,7 +27,7 @@ body {
 </head>
 <body onload="load()">
 
-	<div class="panel">
+	<div class="panel bottom left">
 		<div>
 			<button onclick="master.m_all(S_RED)">red</button>
 		</div>
@@ -57,6 +61,25 @@ body {
 		<div>
 			<button onclick="setInterval(engine.mouseDown, 300)">interval</button>
 			<button onclick="for(let i of is) i.count = -1;">inf</button>
+		</div>
+		<div>
+			<button onclick="opts.speed = 1">x1</button>
+			<button onclick="opts.speed = 2">x2</button>
+			<button onclick="opts.speed = 3">x3</button>
+			<button onclick="opts.speed = 4">x4</button>
+			<button onclick="opts.speed = 8">x8</button>
+		</div>
+	</div>
+
+	<div class="panel top right">
+		<div>
+			sync_start<input type="checkbox" onchange="opts.sync_start = this.checked">
+		</div>
+		<div>
+			show lights<input type="checkbox" onchange="opts.show.lights = this.checked" checked>
+		</div>
+		<div>
+			show wait<input type="checkbox" onchange="opts.show.wait = this.checked" checked>
 		</div>
 	</div>
 
