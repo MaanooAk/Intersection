@@ -349,6 +349,33 @@ function Handler(master) {
     }
 }
 
+function Renderer() {
+
+    this.draw_curves = function(g, ps, ss, cond) {
+        i = 0;
+        for (let p of ps) {
+            let s = ss[i];
+            i++;
+            if (s.s != cond) continue;
+
+            g.beginPath();
+            if (p.cr > 0) {
+                g.arc(p.cc.x, p.cc.y, p.cr, p.cs1, p.cs2, p.cs3);
+            } else {
+                if (p.s1.x == p.e1.x) {
+                    g.moveTo(p.s1.x, (p.s1.y + p.e1.y) / 2 - 87.5);
+                    g.lineTo(p.s1.x, (p.s1.y + p.e1.y) / 2 + 87.5);
+                } else {
+                    g.moveTo((p.s1.x + p.e1.x) / 2 - 87.5, p.s1.y);
+                    g.lineTo((p.s1.x + p.e1.x) / 2 + 87.5, p.s1.y);
+                }
+            }
+            g.stroke();
+        }
+    }
+
+}
+
 function load() {
 
     engine = new Engine('canvas', true);
@@ -360,6 +387,7 @@ function load() {
 
     master = new Master(ps, cs, ss);
     handler = new Handler(master);
+    renderer = new Renderer();
 
     engine.init = function() { };
 
@@ -437,11 +465,16 @@ function load() {
         let w = engine.getW();
         let h = engine.getH();
 
+        g.lineCap = "round";
+
         g.fillStyle = "#fff";
         g.fillRect(0, 0, w, h)
         g.fillStyle = "#000";
 
         if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
+
+        g.strokeStyle = "#ccc";
+        g.lineWidth = 2;
 
         let i = 0;
         for (let p of ps) {
@@ -463,6 +496,18 @@ function load() {
             //g.fillText(i++, p.e1.x, p.e1.y);
 
         }
+
+        g.strokeStyle = "#fcc";
+        g.lineWidth = 4;
+        renderer.draw_curves(g, ps, ss, S_RED);
+
+        g.strokeStyle = "#fff";
+        g.lineWidth = 9;
+        renderer.draw_curves(g, ps, ss, S_GRE);
+
+        g.strokeStyle = "#080";
+        g.lineWidth = 5;
+        renderer.draw_curves(g, ps, ss, S_GRE);
 
         for (let c of cs) {
             if (!c.a) continue;
