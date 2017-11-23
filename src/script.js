@@ -68,7 +68,7 @@ var opts = {
     speed: 1,
     show: {
         lights: true,
-        wait: true,
+        wait: false,
     }
 }
 
@@ -205,6 +205,17 @@ function Input(p_i) {
     }
 }
 
+var master_configs = {
+    classic: [
+        [200, M_CLA, 0],
+        [200, M_LIN, 1],
+        [200, M_CLA, 1],
+        [200, M_CLA, 3],
+        [200, M_LIN, 0],
+        [200, M_CLA, 2],
+    ]
+}
+
 function Master(ps, cs, ss) {
 
     this.ps = ps;
@@ -331,17 +342,10 @@ function Master(ps, cs, ss) {
     }
 }
 
-function Handler(master) {
+function Handler(master, config) {
     this.master = master;
 
-    this.config = [
-        [200, M_CLA, 0],
-        [200, M_LIN, 1],
-        [200, M_CLA, 1],
-        [200, M_CLA, 3],
-        [200, M_LIN, 0],
-        [200, M_CLA, 2],
-    ];
+    this.config = config;
     this.ci = 0;
 
     this.t = 0;
@@ -411,7 +415,7 @@ function load() {
     is = [];
 
     master = new Master(ps, cs, ss);
-    handler = new Handler(master);
+    handler = new Handler(master, master_configs.classic);
     renderer = new Renderer();
 
     engine.init = function() { };
@@ -637,7 +641,7 @@ function load() {
         }
 
         master = new Master(ps, cs, ss);
-        handler = new Handler(master);
+        handler = new Handler(master, master_configs.classic);
         handler.start();
     };
 
