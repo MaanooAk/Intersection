@@ -78,6 +78,7 @@ button.dire {
 			<button onclick="for(let i of is) i.count = -1;">inf</button>
 		</div>
 		<div>
+			<button onclick="opts.speed = 0" class="dire">x0</button>
 			<button onclick="opts.speed = 1" class="dire">x1</button>
 			<button onclick="opts.speed = 2" class="dire">x2</button>
 			<button onclick="opts.speed = 3" class="dire">x3</button>
@@ -94,8 +95,12 @@ button.dire {
 			show lights<input type="checkbox" onchange="opts.show.lights = this.checked" checked>
 		</div>
 		<div>
-			show wait<input type="checkbox" onchange="opts.show.wait = this.checked" checked>
+			show wait<input type="checkbox" onchange="opts.show.wait = this.checked">
 		</div>
+	</div>
+
+	<div class="panel top left">
+
 	</div>
 
 	<canvas id="canvas" width="600" height="600"></canvas>

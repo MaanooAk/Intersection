@@ -72,6 +72,17 @@ var opts = {
     }
 }
 
+var master_configs = {
+    classic: [
+        [200, M_CLA, 0],
+        [200, M_LIN, 1],
+        [200, M_CLA, 1],
+        [200, M_CLA, 3],
+        [200, M_LIN, 0],
+        [200, M_CLA, 2],
+    ]
+}
+
 function rnd(c) {
     return (Math.random() * c) | 0;
 }
@@ -165,7 +176,8 @@ function Car(p_i, ps, ss) {
     this.dur = 0;
     this.edur = ps[p_i].len / this.mspeed;
 
-    this.qi = ss[this.pro_i].q++;
+    this.qi = ss[this.pro_i].q;
+    ss[this.pro_i].q += 1;
 
     this.next = null;
 
@@ -186,7 +198,7 @@ function Input(p_i) {
 
     this.can_add = function() {
         if (this.count == 0) return false;
-        if (this.last_car == null) return true;
+        if (this.last_car == null || !this.last_car.a) return true;
 
         //this.last_car.speed == this.last_car.mspeed &&
         return this.last_car.pro > 30;
@@ -196,24 +208,13 @@ function Input(p_i) {
         this.count -= 1;
         let ncar = new Car(this.p_i, ps, ss);
 
-        if (this.last_car != null) {
+        if (this.last_car != null && this.last_car.a) {
             ncar.speed = this.last_car.speed;
             ncar.next = this.last_car;
         }
         this.last_car = ncar;
         cs.push(this.last_car);
     }
-}
-
-var master_configs = {
-    classic: [
-        [200, M_CLA, 0],
-        [200, M_LIN, 1],
-        [200, M_CLA, 1],
-        [200, M_CLA, 3],
-        [200, M_LIN, 0],
-        [200, M_CLA, 2],
-    ]
 }
 
 function Master(ps, cs, ss) {
@@ -226,22 +227,19 @@ function Master(ps, cs, ss) {
         let s = this.ss[i];
         let p = this.ps[i];
 
-        //if(!s.setRed()) return;
+        // if(!s.setRed()) return;
         s.setRed();
+        s.q = 0;
 
-        let l = [];
         for (let c of this.cs) {
             if (!c.a) continue;
-            if (c.pro_i == i && c.pro < p.sig) {
-                l.push(c);
+            if (c.pro_i == i && c.pro <= p.sig) {
+
+                c.qi = s.q;
+                s.q += 1;
             }
         }
 
-        l.sort(function (a, b) { return b.pro - a.pro; });
-
-        for (let c of l) {
-            c.qi = this.ss[i].q++;
-        }
     }
 
     this.gre = function(i) {
@@ -249,7 +247,7 @@ function Master(ps, cs, ss) {
         let p = this.ps[i];
 
         for (let ci of COL[i]) {
-            if (this.ss[ci].s == S_GRE) this.red(ci);
+            this.red(ci);
         }
 
         if(!s.setGre()) return;
@@ -438,6 +436,15 @@ function load() {
             let s = ss[c.pro_i];
 
             let stop = p.sig - 30 * c.qi;
+            // if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 10) {
+            //     if (c.speed > 0 && stop - c.pro > 0) {
+            //         c.speed = 0;// c.mspeed * (stop - c.pro) / 100;
+            //         if (c.speed <= 0.01) {
+            //             c.speed = 0;
+            //         }
+            //     } else {
+            //         c.speed = 0;
+            //     }
             if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 100) {
                 if (c.speed > 0 && stop - c.pro > 0) {
                     c.speed = c.mspeed * (stop - c.pro) / 100;
@@ -451,7 +458,7 @@ function load() {
 
                 let perf = true;
                 if (!opts.sync_start) {
-                    perf = c.next == null || c.next.pro >= c.pro + 35;
+                    perf = c.next == null || !c.next.a || c.next.pro >= c.pro + 35;
                 }
 
                 if (perf) {
@@ -480,10 +487,13 @@ function load() {
         // clean up
 
         // TODO move to function
-        if (cs.length > 500) {
-            ocs = cs;
-            cs = [];
-            for (let i of ocs) if (i.a) cs.push(i);
+        if (cs.length > 400) {
+            tmp = [];
+            while(cs.length > 0) tmp.push(cs.pop());
+            while(tmp.length > 0) {
+                let c = tmp.pop();
+                if (c.a) cs.push(c);
+            }
         }
 
         }
@@ -627,6 +637,9 @@ function load() {
             new Path(w, h/2 - hrs, 0, h/2 - hrs, 0, D_R, sigw),
             new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD, sigw),
         ]
+
+        ss = [];
+        is = [];
 
         let i = 0;
         for (let p of ps) {
