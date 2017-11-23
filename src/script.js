@@ -506,7 +506,7 @@ function load() {
         g.lineCap = "round";
 
         g.fillStyle = "#fff";
-        g.fillRect(0, 0, w, h)
+        g.clearRect(0, 0, w, h)
         g.fillStyle = "#000";
 
         if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
