@@ -12,7 +12,11 @@ body {
 	overflow: hidden;
 }
 
+body:hover .panel {
+	display: inline-block;
+}
 .panel {
+	display: none;
 	position: fixed;
 }
 
@@ -89,13 +93,13 @@ button.dire {
 
 	<div class="panel top right">
 		<div>
-			sync_start<input type="checkbox" onchange="opts.sync_start = this.checked">
+			sync_start <input type="checkbox" onchange="opts.sync_start = this.checked">
 		</div>
 		<div>
-			show lights<input type="checkbox" onchange="opts.show.lights = this.checked" checked>
+			lights <input type="checkbox" onchange="opts.show.lights = this.checked" checked>
 		</div>
 		<div>
-			show wait<input type="checkbox" onchange="opts.show.wait = this.checked">
+			delay <input type="checkbox" onchange="opts.show.delay = this.checked">
 		</div>
 	</div>
 

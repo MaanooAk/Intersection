@@ -68,7 +68,7 @@ var opts = {
     speed: 1,
     show: {
         lights: true,
-        wait: false,
+        delay: false,
     }
 }
 
@@ -556,7 +556,7 @@ function load() {
 
             cur = c.pro;
 
-            if (opts.show.wait) {
+            if (opts.show.delay) {
                 if (c.delay < 4000) g.fillStyle = "rgb(" + ((c.delay * 255 / 4000)|0) + ", 0, 0)";
                 else g.fillStyle = "#ff0000";
             }
