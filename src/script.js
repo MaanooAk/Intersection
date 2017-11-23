@@ -175,15 +175,12 @@ function Car(p_i, ps, ss) {
 
     this.dur = 0;
     this.edur = ps[p_i].len / this.mspeed;
+    this.delay = 0;
 
     this.qi = ss[this.pro_i].q;
     ss[this.pro_i].q += 1;
 
     this.next = null;
-
-    this.durprog = function() {
-        return this.dur / (this.edur * this.pro / this.len);
-    }
 
     this.die = function() {
         this.a = false;
@@ -477,6 +474,8 @@ function load() {
 
             c.pro += c.speed;
 
+            c.delay += c.mspeed - c.speed;
+
             c.dur += 1;
 
             if (c.pro >= p.len + 30) {
@@ -558,9 +557,7 @@ function load() {
             cur = c.pro;
 
             if (opts.show.wait) {
-                let durprog = c.durprog();
-
-                if (durprog < 20) g.fillStyle = "rgb(" + ((durprog * 255 / 20)|0) + ", 0, 0)";
+                if (c.delay < 4000) g.fillStyle = "rgb(" + ((c.delay * 255 / 4000)|0) + ", 0, 0)";
                 else g.fillStyle = "#ff0000";
             }
 
