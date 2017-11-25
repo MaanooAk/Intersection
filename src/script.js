@@ -409,7 +409,7 @@ function Renderer() {
         }
     }
 
-    this.draw_car = function(g, c) {
+    this.draw_car = function(g, ps, c) {
         if (!c.a) return;
 
         let p = ps[c.pro_i];
@@ -510,18 +510,18 @@ function load() {
 
         for (let repeats=0; repeats<opts.speed; repeats++) {
 
-        handler.update(1);
+        world.handler.update(1);
 
-        for (let i of is) {
+        for (let i of world.is) {
             if (i.can_add()) {
-                i.add(ps, cs, ss);
+                i.add(world.ps, world.cs, world.ss);
             }
         }
 
-        for (let c of cs) {
+        for (let c of world.cs) {
             if (!c.a) continue;
-            let p = ps[c.pro_i];
-            let s = ss[c.pro_i];
+            let p = world.ps[c.pro_i];
+            let s = world.ss[c.pro_i];
 
             let stop = p.sig - 30 * c.qi;
             if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 100) {
@@ -572,12 +572,12 @@ function load() {
         // clean up
 
         // TODO move to function
-        if (cs.length > 400) {
+        if (world.cs.length > 400) {
             tmp = [];
-            while(cs.length > 0) tmp.push(cs.pop());
+            while(world.cs.length > 0) tmp.push(world.cs.pop());
             while(tmp.length > 0) {
                 let c = tmp.pop();
-                if (c.a) cs.push(c);
+                if (c.a) world.cs.push(c);
             }
         }
 
@@ -602,7 +602,7 @@ function load() {
             g.strokeStyle = "#ccc";
             g.lineWidth = 2;
 
-            for (let p of ps) {
+            for (let p of world.ps) {
                 renderer.draw_path(g, p);
             }
         }
@@ -611,22 +611,22 @@ function load() {
 
             g.strokeStyle = "#fcc";
             g.lineWidth = 4;
-            renderer.draw_curves(g, ps, ss, S_RED);
+            renderer.draw_curves(g, world.ps, world.ss, S_RED);
 
             g.strokeStyle = "#fff";
             g.lineWidth = 9;
-            renderer.draw_curves(g, ps, ss, S_GRE);
+            renderer.draw_curves(g, world.ps, world.ss, S_GRE);
 
             g.strokeStyle = "#080";
             g.lineWidth = 5;
-            renderer.draw_curves(g, ps, ss, S_GRE);
+            renderer.draw_curves(g, world.ps, world.ss, S_GRE);
         }
 
         if (opts.show.cars) {
 
             g.fillStyle = "#000";
 
-            for (let c of cs) {
+            for (let c of world.cs) {
                 if (!c.a) continue;
 
                 if (opts.show.delay) {
@@ -634,7 +634,7 @@ function load() {
                     else g.fillStyle = "#ff0000";
                 }
 
-                renderer.draw_car(g, c);
+                renderer.draw_car(g, world.ps, c);
             }
         }
 
@@ -653,7 +653,7 @@ function load() {
         let sigw = w/2 -rtb;
         let sigh = h/2 -rtb;
 
-        ps = [
+        let ps = [
             new Path(w/2 + hrs - ls, h, 0, h/2 - hrs + ls, rtb, D_UL, sigh),
             new Path(w/2 + hrs, h, w/2 + hrs, 0, 0, D_U, sigh),
             new Path(w/2 + hrs + ls, h, w, h/2 + hrs + ls, rts, D_UR, sigh),
@@ -673,23 +673,13 @@ function load() {
 
         world = new World(ps);
 
-        cs = world.cs;
-        ss = world.ss;
-        is = world.is;
-        master = world.master;
-        handler = world.handler;
-
-        // for (let i=0; i<20; i++) {
-        //     is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
-        // }
-
-        handler.start();
+        world.handler.start();
     };
 
     engine.mouseDown = function(e) {
 
         for (let i=0; i<opts.speed; i++) {
-            is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
+            world.is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
         }
 
         // console.log(e.offsetX, e.offsetY);

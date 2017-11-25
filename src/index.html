@@ -51,28 +51,28 @@ button.dire {
 
 	<div class="panel bottom left">
 		<div>
-			<button onclick="master.m_all(S_RED)">red</button>
-			<button onclick="master.m_corners(S_GRE)">corners</button>
+			<button onclick="world.master.m_all(S_RED)">red</button>
+			<button onclick="world.master.m_corners(S_GRE)">corners</button>
 		</div>
 		<div>
-			<button onclick="master.m_line(S_GRE, true)" class="dire">↑↓</button>
-			<button onclick="master.m_line(S_GRE, false)" class="dire">⇆</button>
+			<button onclick="world.master.m_line(S_GRE, true)" class="dire">↑↓</button>
+			<button onclick="world.master.m_line(S_GRE, false)" class="dire">⇆</button>
 		</div>
 		<div>
-			<button onclick="master.m_curve(S_GRE, true)" class="dire">↖↘</button>
-			<button onclick="master.m_curve(S_GRE, false)" class="dire">↗↙</button>
+			<button onclick="world.master.m_curve(S_GRE, true)" class="dire">↖↘</button>
+			<button onclick="world.master.m_curve(S_GRE, false)" class="dire">↗↙</button>
 		</div>
 		<div>
-			<button onclick="master.m_cla(S_GRE, 0)" class="dire">↖↑</button>
-			<button onclick="master.m_cla(S_GRE, 1)" class="dire">↓↘</button>
-			<button onclick="master.m_cla(S_GRE, 2)" class="dire">←↙</button>
-			<button onclick="master.m_cla(S_GRE, 3)" class="dire">↗→</button>
+			<button onclick="world.master.m_cla(S_GRE, 0)" class="dire">↖↑</button>
+			<button onclick="world.master.m_cla(S_GRE, 1)" class="dire">↓↘</button>
+			<button onclick="world.master.m_cla(S_GRE, 2)" class="dire">←↙</button>
+			<button onclick="world.master.m_cla(S_GRE, 3)" class="dire">↗→</button>
 		</div>
 		<div>
-			<button onclick="master.m_spe(S_GRE, 0)" class="dire">↗↑</button>
-			<button onclick="master.m_spe(S_GRE, 1)" class="dire">↓↙</button>
-			<button onclick="master.m_spe(S_GRE, 2)" class="dire">→↘</button>
-			<button onclick="master.m_spe(S_GRE, 3)" class="dire">↖←</button>
+			<button onclick="world.master.m_spe(S_GRE, 0)" class="dire">↗↑</button>
+			<button onclick="world.master.m_spe(S_GRE, 1)" class="dire">↓↙</button>
+			<button onclick="world.master.m_spe(S_GRE, 2)" class="dire">→↘</button>
+			<button onclick="world.master.m_spe(S_GRE, 3)" class="dire">↖←</button>
 		</div>
 	</div>
 
@@ -84,7 +84,7 @@ button.dire {
 		<br>
 		<div>
 			<button onclick="setInterval(engine.mouseDown, 300)">interval</button>
-			<button onclick="for(let i of is) i.count = -1;">inf</button>
+			<button onclick="for(let i of world.is) i.count = -1;">inf</button>
 		</div>
 		<div>
 			<button onclick="opts.speed = 0" class="dire">x0</button>
