@@ -207,9 +207,10 @@ function Input(p_i) {
     this.add = function(ps, cs, ss) {
         this.count -= 1;
         let ncar = new Car(this.p_i, ps, ss);
+        ncar.pro = -30
 
         if (this.last_car != null && this.last_car.a) {
-            ncar.speed = this.last_car.speed;
+            // ncar.speed = this.last_car.speed;
             ncar.next = this.last_car;
         }
         this.last_car = ncar;
@@ -365,7 +366,7 @@ function Handler(master, config) {
 
     this.update = function() {
         if (this.config.length == 0) return;
-        
+
         this.t += 1;
 
         if (this.t >= this.config[this.ci][0]) {
@@ -524,6 +525,7 @@ function load() {
 
             let stop = p.sig - 30 * c.qi;
             if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 100) {
+
                 if (c.speed > 0 && stop - c.pro > 0) {
                     c.speed = c.mspeed * (stop - c.pro) / 100;
                     if (c.speed <= 0.01) {
@@ -534,23 +536,24 @@ function load() {
                 }
             } else {//if (c.speed < c.mspeed) {
 
-                let perf = true;
-                if (!opts.sync_start) {
-                    perf = c.next == null || !c.next.a || c.next.pro >= c.pro + 35;
-                } else {
-                    perf = c.next == null || !c.next.a || c.next.pro >= c.pro + 25;
+                let space = opts.sync_start ? (25 + c.speed * 4) : (35 + c.speed * 10);
+
+                let next_dis = 10000;
+                if (c.next != null && c.next.a) {
+                    next_dis = c.next.pro - c.pro;
                 }
 
-                if (perf) {
+                if (next_dis >= space) {
 
                     c.speed += c.mspeed / 100;
-                    if (c.speed > c.mspeed) {
-                        c.speed = c.mspeed;
-                    }
+                    if (c.speed > c.mspeed) c.speed = c.mspeed;
+
                 } else {
 
-                    if (c.next != null && c.next.speed < c.speed) {
-                        c.speed -= c.mspeed / 20;
+                    if (c.speed > c.next.speed) {
+
+                        c.speed -= c.mspeed / 10;
+                        if (c.speed < 0) c.speed = 0;
                     }
                 }
             }
@@ -676,9 +679,9 @@ function load() {
         master = world.master;
         handler = world.handler;
 
-        for (let i=0; i<20; i++) {
-            is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
-        }
+        // for (let i=0; i<20; i++) {
+        //     is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
+        // }
 
         handler.start();
     };
