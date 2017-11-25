@@ -65,9 +65,12 @@ const M_SPE = 3;
 
 var opts = {
     sync_start: false,
+    debug: false,
     speed: 1,
     show: {
+        paths: true,
         lights: true,
+        cars: true,
         delay: false,
     }
 }
@@ -398,6 +401,71 @@ function Renderer() {
         }
     }
 
+    this.draw_car = function(g, c) {
+        if (!c.a) return;
+
+        let p = ps[c.pro_i];
+        let cur = c.pro;
+
+        if (cur < p.len_part(0)) {
+            prog = cur / p.len_part(0);
+
+            let x = p.s1.x + (p.e1.x - p.s1.x) * prog;
+            let y = p.s1.y + (p.e1.y - p.s1.y) * prog;
+
+            if (p.dir < D_SWAP) {
+                g.fillRect(x -5, y -10, 10, 20)
+            } else {
+                g.fillRect(x -10, y -5, 20, 10)
+            }
+
+        } else if (cur < p.len_part(0) + p.len_part(1)) {
+
+            prog = (cur - p.len_part(0)) / p.len_part(1);
+
+            let x = p.e1.x + (p.s2.x - p.e1.x) * prog;
+            let y = p.e1.y + (p.s2.y - p.e1.y) * prog;
+
+            g.save();
+            g.translate(p.cc.x, p.cc.y)
+            g.rotate(p.cs1 + prog * (p.cs2-p.cs1))
+
+            g.fillRect(p.cr -5, -10, 10, 20)
+
+            g.restore();
+
+        } else {
+            prog = (cur - p.len_part(0) - p.len_part(1)) / p.len_part(2);
+
+            let x = p.s2.x + (p.e2.x - p.s2.x) * prog;
+            let y = p.s2.y + (p.e2.y - p.s2.y) * prog;
+
+            if (p.dir < D_SWAP) {
+                g.fillRect(x -10, y -5, 20, 10)
+            } else {
+                g.fillRect(x -5, y -10, 10, 20)
+            }
+        }
+
+    }
+
+    this.draw_path = function(g, p) {
+
+        g.beginPath();
+
+        g.moveTo(p.s1.x, p.s1.y);
+        g.lineTo(p.e1.x, p.e1.y);
+
+        if (p.cr > 0) {
+            g.arc(p.cc.x, p.cc.y, p.cr, p.cs1, p.cs2, p.cs3);
+        }
+
+        g.moveTo(p.s2.x, p.s2.y);
+        g.lineTo(p.e2.x, p.e2.y);
+
+        g.stroke();
+
+    }
 }
 
 function load() {
@@ -511,30 +579,17 @@ function load() {
         g.clearRect(0, 0, w, h)
         g.fillStyle = "#000";
 
-        if (engine.getFps() < 58) g.fillText(engine.getFps(), 20, 20)
+        if (engine.getFps() < 58 || opts.debug) g.fillText(engine.getFps(), 20, 20)
 
-        g.strokeStyle = "#ccc";
-        g.lineWidth = 2;
 
-        let i = 0;
-        for (let p of ps) {
 
-            g.beginPath();
+        if (opts.show.paths) {
 
-            g.moveTo(p.s1.x, p.s1.y);
-            g.lineTo(p.e1.x, p.e1.y);
-
-            if (p.cr > 0) {
-                g.arc(p.cc.x, p.cc.y, p.cr, p.cs1, p.cs2, p.cs3);
+            g.strokeStyle = "#ccc";
+            g.lineWidth = 2;
+            for (let p of ps) {
+                renderer.draw_path(g, p);
             }
-
-            g.moveTo(p.s2.x, p.s2.y);
-            g.lineTo(p.e2.x, p.e2.y);
-
-            g.stroke();
-
-            //g.fillText(i++, p.e1.x, p.e1.y);
-
         }
 
         if (opts.show.lights) {
@@ -552,55 +607,19 @@ function load() {
             renderer.draw_curves(g, ps, ss, S_GRE);
         }
 
-        for (let c of cs) {
-            if (!c.a) continue;
-            let p = ps[c.pro_i];
+        if (opts.show.cars) {
 
-            cur = c.pro;
+            g.fillStyle = "#000";
 
-            if (opts.show.delay) {
-                if (c.delay < 4000) g.fillStyle = "rgb(" + ((c.delay * 255 / 4000)|0) + ", 0, 0)";
-                else g.fillStyle = "#ff0000";
-            }
+            for (let c of cs) {
+                if (!c.a) continue;
 
-            if (cur < p.len_part(0)) {
-                prog = cur / p.len_part(0);
-
-                let x = p.s1.x + (p.e1.x - p.s1.x) * prog;
-                let y = p.s1.y + (p.e1.y - p.s1.y) * prog;
-
-                if (p.dir < D_SWAP) {
-                    g.fillRect(x -5, y -10, 10, 20)
-                } else {
-                    g.fillRect(x -10, y -5, 20, 10)
+                if (opts.show.delay) {
+                    if (c.delay < 4000) g.fillStyle = "rgb(" + ((c.delay * 255 / 4000)|0) + ", 0, 0)";
+                    else g.fillStyle = "#ff0000";
                 }
 
-            } else if (cur < p.len_part(0) + p.len_part(1)) {
-
-                prog = (cur - p.len_part(0)) / p.len_part(1);
-
-                let x = p.e1.x + (p.s2.x - p.e1.x) * prog;
-                let y = p.e1.y + (p.s2.y - p.e1.y) * prog;
-
-                g.save();
-                g.translate(p.cc.x, p.cc.y)
-                g.rotate(p.cs1 + prog * (p.cs2-p.cs1))
-
-                g.fillRect(p.cr -5, -10, 10, 20)
-
-                g.restore();
-
-            } else {
-                prog = (cur - p.len_part(0) - p.len_part(1)) / p.len_part(2);
-
-                let x = p.s2.x + (p.e2.x - p.s2.x) * prog;
-                let y = p.s2.y + (p.e2.y - p.s2.y) * prog;
-
-                if (p.dir < D_SWAP) {
-                    g.fillRect(x -10, y -5, 20, 10)
-                } else {
-                    g.fillRect(x -5, y -10, 10, 20)
-                }
+                renderer.draw_car(g, c);
             }
         }
 
