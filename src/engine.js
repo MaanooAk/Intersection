@@ -17,7 +17,7 @@ function Engine(canvas_id, fullscreen) {
 
 	var fps_duration = 0;
 	var fps_frames = 0;
-	var fps = 1;
+	var fps = 60;
 
 	this.loop = function() {
 
