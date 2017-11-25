@@ -78,6 +78,11 @@ button.dire {
 
 	<div class="panel bottom right">
 		<div>
+			<button onclick="world.handler.set_config([])">none</button>
+			<button onclick="world.handler.set_config(master_configs.classic)">classic</button>
+		</div>
+		<br>
+		<div>
 			<button onclick="setInterval(engine.mouseDown, 300)">interval</button>
 			<button onclick="for(let i of is) i.count = -1;">inf</button>
 		</div>

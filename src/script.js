@@ -345,12 +345,17 @@ function Handler(master, config) {
 
     this.config = config;
     this.ci = 0;
-
     this.t = 0;
-    // this.tm = 0;
-    // for (let i of this.config) this.tm += i[0];
+
+    this.set_config = function (config) {
+        this.config = config;
+
+        this.start();
+    }
 
     this.start = function() {
+        if (this.config.length == 0) return;
+
         this.ci = 0;
         this.t = 0;
 
@@ -359,6 +364,8 @@ function Handler(master, config) {
     }
 
     this.update = function() {
+        if (this.config.length == 0) return;
+        
         this.t += 1;
 
         if (this.t >= this.config[this.ci][0]) {
@@ -468,17 +475,32 @@ function Renderer() {
     }
 }
 
+function World(ps) {
+
+    this.ps = ps;
+    this.cs = [];
+
+    this.ss = [];
+    this.is = [];
+
+    let i = 0;
+    for (let p of ps) {
+        this.ss.push(new Signal());
+        this.is.push(new Input(i));
+        i += 1;
+    }
+
+    this.master = new Master(this.ps, this.cs, this.ss);
+    this.handler = new Handler(this.master, master_configs.classic);
+
+}
+
 function load() {
 
     engine = new Engine('canvas', true);
 
-    ps = [];
-    cs = [];
-    ss = [];
-    is = [];
+    world = null;
 
-    master = new Master(ps, cs, ss);
-    handler = new Handler(master, master_configs.classic);
     renderer = new Renderer();
 
     engine.init = function() { };
@@ -501,15 +523,6 @@ function load() {
             let s = ss[c.pro_i];
 
             let stop = p.sig - 30 * c.qi;
-            // if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 10) {
-            //     if (c.speed > 0 && stop - c.pro > 0) {
-            //         c.speed = 0;// c.mspeed * (stop - c.pro) / 100;
-            //         if (c.speed <= 0.01) {
-            //             c.speed = 0;
-            //         }
-            //     } else {
-            //         c.speed = 0;
-            //     }
             if (s.s == S_RED && c.pro <= p.sig && c.speed >= 0 && stop - c.pro < 100) {
                 if (c.speed > 0 && stop - c.pro > 0) {
                     c.speed = c.mspeed * (stop - c.pro) / 100;
@@ -581,12 +594,11 @@ function load() {
 
         if (engine.getFps() < 58 || opts.debug) g.fillText(engine.getFps(), 20, 20)
 
-
-
         if (opts.show.paths) {
 
             g.strokeStyle = "#ccc";
             g.lineWidth = 2;
+
             for (let p of ps) {
                 renderer.draw_path(g, p);
             }
@@ -656,23 +668,18 @@ function load() {
             new Path(w, h/2 - hrs +ls, w/2 - hrs +ls, h, rtb, D_RD, sigw),
         ]
 
-        ss = [];
-        is = [];
+        world = new World(ps);
 
-        let i = 0;
-        for (let p of ps) {
-            ss.push(new Signal());
-            is.push(new Input(i));
-            i += 1;
-        }
+        cs = world.cs;
+        ss = world.ss;
+        is = world.is;
+        master = world.master;
+        handler = world.handler;
 
-        cs = [];
         for (let i=0; i<20; i++) {
             is[rnd(4)*3 + rnd(2) + rnd(2)].count += 1;
         }
 
-        master = new Master(ps, cs, ss);
-        handler = new Handler(master, master_configs.classic);
         handler.start();
     };
 
