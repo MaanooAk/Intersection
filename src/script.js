@@ -451,11 +451,13 @@ function load() {
                 } else {
                     c.speed = 0;
                 }
-            } else if (c.speed < c.mspeed) {
+            } else {//if (c.speed < c.mspeed) {
 
                 let perf = true;
                 if (!opts.sync_start) {
                     perf = c.next == null || !c.next.a || c.next.pro >= c.pro + 35;
+                } else {
+                    perf = c.next == null || !c.next.a || c.next.pro >= c.pro + 25;
                 }
 
                 if (perf) {
@@ -467,7 +469,7 @@ function load() {
                 } else {
 
                     if (c.next != null && c.next.speed < c.speed) {
-                        c.speed -= c.mspeed / 100;
+                        c.speed -= c.mspeed / 20;
                     }
                 }
             }
@@ -668,4 +670,6 @@ function load() {
     engine.mouseUp = function(e) { };
 
     engine.start();
+    setInterval(engine.mouseDown, 300)
+
 }
