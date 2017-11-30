@@ -32,18 +32,18 @@ const P_L1 = 7;
 const P_L2 = 6;
 
 var COL = {};
-COL[P_D0] = [ P_L1, P_U2];
-COL[P_D1] = [P_U2, P_R1, P_R2, P_L1,  P_R0];
-COL[P_D2] = [P_U1, P_R2, P_L1, P_L2,  P_U0];
-COL[P_U0] = [ P_R1, P_D2];
-COL[P_U1] = [P_D2, P_R1, P_L1, P_L2,  P_L0];
-COL[P_U2] = [P_D1, P_R2, P_R1, P_L2,  P_D0];
-COL[P_R0] = [ P_D1, P_L2];
-COL[P_R1] = [P_D1, P_U1, P_U2, P_L2,  P_U0];
-COL[P_R2] = [P_D1, P_D2, P_U2, P_L1,  P_L0];
-COL[P_L0] = [ P_U1, P_R2];
-COL[P_L1] = [P_D1, P_D2, P_U1, P_R2,  P_D0];
-COL[P_L2] = [P_D2, P_U1, P_U2, P_R1,  P_R0];
+COL[P_D0] = [P_L1, P_U2];
+COL[P_U0] = [P_R1, P_D2];
+COL[P_R0] = [P_D1, P_L2];
+COL[P_L0] = [P_U1, P_R2];
+COL[P_D1] = [P_R0, P_R1, P_R2, P_L1, P_L2, P_U2];
+COL[P_U1] = [P_L0, P_L1, P_L2, P_R1, P_R2, P_D2];
+COL[P_R1] = [P_U0, P_U1, P_U2, P_D1, P_D2, P_L2];
+COL[P_L1] = [P_D0, P_D1, P_D2, P_U1, P_U2, P_R2];
+COL[P_D2] = [P_U1, P_U0, P_R1, P_R2, P_L1, P_L2];
+COL[P_U2] = [P_D1, P_D0, P_R1, P_R2, P_L1, P_L2];
+COL[P_R2] = [P_L1, P_L0, P_U1, P_U2, P_D1, P_D2];
+COL[P_L2] = [P_R1, P_R0, P_U1, P_U2, P_D1, P_D2];
 
 const M_LIN = 0;
 const M_CUR = 1;
@@ -396,7 +396,7 @@ function AHandler(master, lambda) {
 
         this.t += 1;
 
-        if (this.t >= 150) {
+        if (this.t >= 100) {
             this.t = 0;
 
             this.perform();
