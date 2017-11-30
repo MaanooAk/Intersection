@@ -140,6 +140,7 @@ function Signal() {
 
     this.s = S_RED;
     this.q = 0;
+    this.qdel = 0;
 
     this.setGre = function() {
         if (this.s == S_GRE) return false;
@@ -150,6 +151,7 @@ function Signal() {
         if (this.s == S_RED) return false;
         this.s = S_RED;
         this.q = 0;
+        this.qdel = 0;
         return true;
     };
 }
@@ -220,6 +222,7 @@ function Master(ps, cs, ss) {
         // if(!s.setRed()) return;
         s.setRed();
         s.q = 0;
+        s.qdel = 0;
 
         for (let c of this.cs) {
             if (!c.a) continue;
@@ -227,6 +230,7 @@ function Master(ps, cs, ss) {
 
                 c.qi = s.q;
                 s.q += 1;
+                s.qdel += c.delay;
             }
         }
 
@@ -409,7 +413,7 @@ function AHandler(master, lambda) {
         for (let i=0; i<12; i++) {
             l.push({
                 p: i,
-                q: master.ss[i].q
+                q: master.ss[i].qdel
             });
         }
 
@@ -448,6 +452,15 @@ function Renderer() {
                 }
             }
             g.stroke();
+        }
+    }
+
+    this.color_car = function(g, delay) {
+
+        if (delay < 4000) {
+            g.fillStyle = "rgb(" + ((delay * 255 / 4000)|0) + ", 0, 0)";
+        } else {
+            g.fillStyle = "#ff0000";
         }
     }
 
@@ -516,6 +529,21 @@ function Renderer() {
         g.stroke();
 
     }
+
+    this.draw_car_slider = function (g, h, avg) {
+        let per = avg / 3000;
+        if (per > 1) per = 1;
+
+        renderer.color_car(g, avg);
+        g.fillRect(20 -5, 10 + h/4 -10 - (per * h/4), 10, 20)
+
+        g.fillStyle = "#000";
+        g.fillText(avg, 40, 15 + h/4 - (per * h/4));
+
+        g.strokeStyle = "#888";
+        g.lineWidth = 1;
+        g.strokeRect(-10, -10, 90, 10 + h/4 + 20)
+    }
 }
 
 function World(ps) {
@@ -525,6 +553,9 @@ function World(ps) {
 
     this.ss = [];
     this.is = [];
+
+    this.avg_delay = 0;
+    this.avg_delay_smooth = 0;
 
     let i = 0;
     for (let p of this.ps) {
@@ -546,6 +577,18 @@ function World(ps) {
         }
 
         return qs;
+    }
+
+    this.update_delay = function() {
+        this.avg_delay = 0;
+        let count = 0;
+        for (let c of this.cs) {
+            if (!c.a) continue;
+            this.avg_delay += c.delay;
+            count += 1;
+        }
+        this.avg_delay = (this.avg_delay / count) | 0;
+        this.avg_delay_smooth += (this.avg_delay - this.avg_delay_smooth) /10;
     }
 
     this.set_handler_config = function(config) {
@@ -631,6 +674,8 @@ function load() {
             }
         }
 
+        }
+
         // clean up
 
         // TODO move to function
@@ -643,7 +688,7 @@ function load() {
             }
         }
 
-        }
+        world.update_delay();
 
     };
 
@@ -691,13 +736,16 @@ function load() {
             for (let c of world.cs) {
                 if (!c.a) continue;
 
-                if (opts.show.delay) {
-                    if (c.delay < 4000) g.fillStyle = "rgb(" + ((c.delay * 255 / 4000)|0) + ", 0, 0)";
-                    else g.fillStyle = "#ff0000";
-                }
+                if (opts.show.delay) renderer.color_car(g, c.delay);
 
                 renderer.draw_car(g, world.ps, c);
             }
+        }
+
+        if (opts.show.delay) {
+
+            renderer.draw_car_slider(g, h, world.avg_delay_smooth | 0);
+
         }
 
     };
