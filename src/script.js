@@ -485,7 +485,7 @@ function World(ps) {
     this.is = [];
 
     let i = 0;
-    for (let p of ps) {
+    for (let p of this.ps) {
         this.ss.push(new Signal());
         this.is.push(new Input(i));
         i += 1;
@@ -493,6 +493,18 @@ function World(ps) {
 
     this.master = new Master(this.ps, this.cs, this.ss);
     this.handler = new Handler(this.master, master_configs.classic);
+
+    this.get_qs = function() {
+        let qs = [];
+
+        let i=0;
+        for (let s of this.ss) {
+            qs[i] = s.q;
+            i+=1;
+        }
+
+        return qs;
+    }
 
 }
 
