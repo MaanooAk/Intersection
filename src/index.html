@@ -51,14 +51,12 @@ button.dire {
 
 	<div class="panel bottom left">
 		<div>
-			<button onclick="world.master.m_all(S_RED)">red</button>
-			<button onclick="world.master.m_corners(S_GRE)">corners</button>
+			<button onclick="world.master.m_all(S_RED)" class="dire">R</button>
+			<button onclick="world.master.m_corners(S_GRE)" class="dire">C</button>
 		</div>
 		<div>
 			<button onclick="world.master.m_line(S_GRE, true)" class="dire">↑↓</button>
 			<button onclick="world.master.m_line(S_GRE, false)" class="dire">⇆</button>
-		</div>
-		<div>
 			<button onclick="world.master.m_curve(S_GRE, true)" class="dire">↖↘</button>
 			<button onclick="world.master.m_curve(S_GRE, false)" class="dire">↗↙</button>
 		</div>
@@ -67,12 +65,6 @@ button.dire {
 			<button onclick="world.master.m_cla(S_GRE, 1)" class="dire">↓↘</button>
 			<button onclick="world.master.m_cla(S_GRE, 2)" class="dire">←↙</button>
 			<button onclick="world.master.m_cla(S_GRE, 3)" class="dire">↗→</button>
-		</div>
-		<div>
-			<button onclick="world.master.m_spe(S_GRE, 0)" class="dire">↗↑</button>
-			<button onclick="world.master.m_spe(S_GRE, 1)" class="dire">↓↙</button>
-			<button onclick="world.master.m_spe(S_GRE, 2)" class="dire">→↘</button>
-			<button onclick="world.master.m_spe(S_GRE, 3)" class="dire">↖←</button>
 		</div>
 	</div>
 
@@ -83,7 +75,7 @@ button.dire {
 			<button onclick="world.set_handler_config(master_configs.adapt)">adapt</button>
 		</div>
 		<br>
-		<div>
+		<div hidden>
 			<button onclick="setInterval(engine.mouseDown, 300)">interval</button>
 			<button onclick="for(let i of world.is) i.count = -1;">inf</button>
 		</div>
@@ -98,6 +90,11 @@ button.dire {
 	</div>
 
 	<div class="panel top right">
+
+		<div>
+			<button onclick="window.open(canvas.toDataURL('image/png'));">image</button>
+		</div>
+
 		<div>
 			sync <input type="checkbox" onchange="opts.sync_start = this.checked">
 		</div>
@@ -112,9 +109,6 @@ button.dire {
 			lights <input type="checkbox" onchange="opts.show.lights = this.checked" checked>
 		</div>
 		<div>
-			sensors <input type="checkbox" onchange="opts.show.sensors = this.checked" checked>
-		</div>
-		<div>
 			cars <input type="checkbox" onchange="opts.show.cars = this.checked" checked>
 		</div>
 		<div>
@@ -123,8 +117,6 @@ button.dire {
 	</div>
 
 	<div class="panel top left">
-
-		<button onclick="window.open(canvas.toDataURL('image/png'));">image</button>
 
 	</div>
 
