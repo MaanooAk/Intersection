@@ -31,19 +31,6 @@ const P_L0 = 8;
 const P_L1 = 7;
 const P_L2 = 6;
 
-// var COL = {};
-// COL[P_D0] = [];
-// COL[P_D1] = [P_U2, P_R1, P_R2, P_L1];
-// COL[P_D2] = [P_U1, P_R2, P_L1, P_L2];
-// COL[P_U0] = [];
-// COL[P_U1] = [P_D2, P_R1, P_L1, P_L2];
-// COL[P_U2] = [P_D1, P_R2, P_R1, P_L2];
-// COL[P_R0] = [];
-// COL[P_R1] = [P_D1, P_U1, P_U2, P_L2];
-// COL[P_R2] = [P_D1, P_D2, P_U2, P_L1];
-// COL[P_L0] = [];
-// COL[P_L1] = [P_D1, P_D2, P_U1, P_R2];
-// COL[P_L2] = [P_D2, P_U1, P_U2, P_R1];
 var COL = {};
 COL[P_D0] = [ P_L1, P_U2];
 COL[P_D1] = [P_U2, P_R1, P_R2, P_L1,  P_R0];
@@ -70,6 +57,7 @@ var opts = {
     show: {
         paths: true,
         lights: true,
+        sensors: false,
         cars: true,
         delay: false,
     }
@@ -83,7 +71,8 @@ var master_configs = {
         [200, M_CLA, 3],
         [200, M_LIN, 0],
         [200, M_CLA, 2],
-    ]
+    ],
+    adapt: "@"
 }
 
 function rnd(c) {
@@ -348,12 +337,6 @@ function Handler(master, config) {
     this.ci = 0;
     this.t = 0;
 
-    this.set_config = function (config) {
-        this.config = config;
-
-        this.start();
-    }
-
     this.start = function() {
         if (this.config.length == 0) return;
 
@@ -381,6 +364,41 @@ function Handler(master, config) {
     this.perform = function() {
         let c = this.config[this.ci];
         this.master.m(c[1], c[2]);
+    }
+}
+
+function AHandler(master, lambda) {
+    this.master = master;
+
+    this.lambda = lambda;
+    this.ci = 0;
+    this.t = 0;
+
+    this.start = function() {
+        if (this.config.length == 0) return;
+
+        this.ci = 0;
+        this.t = 0;
+
+        this.perform();
+    }
+
+    this.update = function() {
+
+        this.t += 1;
+
+        if (this.t >= 50) {
+            this.t = 0;
+
+            this.perform();
+        }
+    }
+
+    this.perform = function() {
+
+        console.log("Boom");
+
+        this.master.sig(S_GRE, c[2]);
     }
 }
 
@@ -504,6 +522,14 @@ function World(ps) {
         }
 
         return qs;
+    }
+
+    this.set_handler_config = function(config) {
+        if (config == "@") {
+            this.handler = new AHandler(this.master, 0.8);
+        } else {
+            this.handler = new Handler(this.master, config);
+        }
     }
 
 }

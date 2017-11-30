@@ -78,8 +78,9 @@ button.dire {
 
 	<div class="panel bottom right">
 		<div>
-			<button onclick="world.handler.set_config([])">none</button>
-			<button onclick="world.handler.set_config(master_configs.classic)">classic</button>
+			<button onclick="world.set_handler_config([])">none</button>
+			<button onclick="world.set_handler_config(master_configs.classic)">classic</button>
+			<button onclick="world.set_handler_config(master_configs.adapt)">adapt</button>
 		</div>
 		<br>
 		<div>
@@ -109,6 +110,9 @@ button.dire {
 		</div>
 		<div>
 			lights <input type="checkbox" onchange="opts.show.lights = this.checked" checked>
+		</div>
+		<div>
+			sensors <input type="checkbox" onchange="opts.show.sensors = this.checked" checked>
 		</div>
 		<div>
 			cars <input type="checkbox" onchange="opts.show.cars = this.checked" checked>
