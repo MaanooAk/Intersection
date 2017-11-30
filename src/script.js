@@ -249,6 +249,15 @@ function Master(ps, cs, ss) {
         else if (c == S_RED) this.red(i);
     }
 
+    this.canalso = function(i) {
+
+        for (let ci of COL[i]) {
+            if (ss[ci].s != S_RED) return false;
+        }
+
+        return true;
+    }
+
     this.m_corners = function(c) {
         this.sig(c, P_D0);
         this.sig(c, P_U0);
@@ -387,7 +396,7 @@ function AHandler(master, lambda) {
 
         this.t += 1;
 
-        if (this.t >= 50) {
+        if (this.t >= 150) {
             this.t = 0;
 
             this.perform();
@@ -396,9 +405,24 @@ function AHandler(master, lambda) {
 
     this.perform = function() {
 
-        console.log("Boom");
+        let l = [];
+        for (let i=0; i<12; i++) {
+            l.push({
+                p: i,
+                q: master.ss[i].q
+            });
+        }
 
-        this.master.sig(S_GRE, c[2]);
+        l.sort(function(i1, i2) {
+            return i2.q - i1.q;
+        })
+
+        this.master.m_all(S_RED);
+        for (let i of l) {
+            if (this.master.canalso(i.p)) {
+                this.master.sig(S_GRE, i.p);
+            }
+        }
     }
 }
 
